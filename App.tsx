@@ -6,7 +6,7 @@ import {
   Link, Info, Package, ClipboardCheck, AlertCircle, PlusCircle, MapPin, Clock, User,
   Pause, Play, LogOut, Edit3, Hash, CloudSync, CloudCheck, CloudOff, Menu,
   Camera, CameraOff, RefreshCw, AlertTriangle, Terminal, Bug,
-  Sun, Moon
+  Sun, Moon, BookOpen, ChevronRight
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
@@ -18,6 +18,38 @@ const LOGS_KEY = 'dafeng_inventory_logs_v1';
 
 type TimeFormat = 'off' | 'datetime' | 'date';
 type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
+
+const APP_VERSION = "v1.2.5";
+const UPDATE_NOTES = [
+  "優化 RWD 響應式佈局，適配筆記型電腦與行動裝置。",
+  "強化淺色模式（白色背景）下的視覺對比度與易讀性。",
+  "新增軟體更新說明與使用教學功能。",
+  "優化掃描邏輯與語音提示，提升作業效率。",
+  "修正部分已知介面顯示問題。"
+];
+
+const GUIDE_STEPS = [
+  {
+    title: "步驟 1：匯入盤點資料",
+    content: "點擊頂端「匯入」按鈕，上傳包含產品型號、條碼、品名、顏色、尺寸及帳面數量的 Excel 或 CSV 檔案。系統將自動解析並建立盤點清單。"
+  },
+  {
+    title: "步驟 2：設定人員與倉庫",
+    content: "在「人員/倉庫」欄位輸入您的姓名與目前作業的倉庫代碼（預設為 T0300）。這些資訊將包含在最終匯出的報表中。"
+  },
+  {
+    title: "步驟 3：開始掃描盤點",
+    content: "確保「暫停」狀態已解除。在掃描框中輸入條碼或點擊相機圖示使用鏡頭掃描。系統會自動比對資料，累加實盤數量並即時計算庫存差異。"
+  },
+  {
+    title: "步驟 4：處理未知條碼",
+    content: "若掃描到不在清單中的條碼，系統會彈出對應視窗。您可以選擇「搜尋」現有產品進行條碼綁定，或選擇「新建」直接建立新的產品品項。"
+  },
+  {
+    title: "步驟 5：檢視與匯出",
+    content: "作業中可點擊底部「未盤項」查看尚未清點的貨品。完成後點擊「結束」按鈕，系統將產生包含所有盤點數據的 Excel 報表供下載。"
+  }
+];
 
 const App: React.FC = () => {
   const [data, setData] = useState<InventoryItem[]>([]);
@@ -44,6 +76,8 @@ const App: React.FC = () => {
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('');
   const [timeFormat, setTimeFormat] = useState<TimeFormat>('date');
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
 
   // Refs to avoid stale closures in scanner callbacks
   const dataRef = useRef(data);
@@ -651,6 +685,18 @@ const App: React.FC = () => {
               </div>
             </div>
 
+            <div className="flex flex-col gap-1 md:gap-3 lg:gap-6">
+              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>資訊</span>
+              <div className={`h-16 md:h-24 lg:h-36 flex items-center gap-2 md:gap-6 p-2 md:p-4 rounded-xl md:rounded-3xl lg:rounded-[3rem] border-2 md:border-4 lg:border-[8px] ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+                <button onClick={() => setShowUpdateModal(true)} className={`h-full flex items-center gap-1 md:gap-4 lg:gap-6 px-4 md:px-8 lg:px-12 rounded-xl md:rounded-2xl lg:rounded-3xl transition-all font-black text-xs md:text-xl lg:text-3xl border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
+                  <Info size={16} className="md:w-8 md:h-8 lg:w-12 lg:h-12" /> 軟體更新
+                </button>
+                <button onClick={() => setShowGuideModal(true)} className={`h-full flex items-center gap-1 md:gap-4 lg:gap-6 px-4 md:px-8 lg:px-12 rounded-xl md:rounded-2xl lg:rounded-3xl transition-all font-black text-xs md:text-xl lg:text-3xl border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
+                  <BookOpen size={16} className="md:w-8 md:h-8 lg:w-12 lg:h-12" /> 使用教學
+                </button>
+              </div>
+            </div>
+
             <div className={`w-px mx-1 md:mx-4 lg:mx-8 self-center h-12 md:h-20 lg:h-32 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-300'}`} />
 
             <div className="flex flex-col gap-1 md:gap-3 lg:gap-6">
@@ -891,6 +937,61 @@ const App: React.FC = () => {
               >
                 關閉
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 軟體更新 Modal */}
+      {showUpdateModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[300] flex items-center justify-center p-4">
+          <div className={`w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border-2 ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+            <div className="p-6 md:p-10 bg-blue-600 text-white flex justify-between items-center">
+              <div>
+                <h3 className="text-2xl md:text-4xl font-black italic">軟體更新說明</h3>
+                <p className="opacity-80 font-bold mt-1">目前版本：{APP_VERSION}</p>
+              </div>
+              <button onClick={() => setShowUpdateModal(false)} className="p-2 hover:bg-white/20 rounded-full transition-colors"><X size={32} /></button>
+            </div>
+            <div className="p-8 md:p-12 space-y-6">
+              <div className="space-y-4">
+                {UPDATE_NOTES.map((note, idx) => (
+                  <div key={idx} className="flex gap-4 items-start">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-2.5 shrink-0" />
+                    <p className="text-lg md:text-2xl font-bold leading-relaxed">{note}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={`p-6 md:p-10 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+              <button onClick={() => setShowUpdateModal(false)} className="w-full py-4 md:py-6 bg-slate-800 text-white rounded-2xl text-xl md:text-2xl font-black hover:bg-slate-700 transition-all">確定</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 使用教學 Modal */}
+      {showGuideModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[300] flex items-center justify-center p-4">
+          <div className={`w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl border-2 max-h-[90vh] flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+            <div className="p-6 md:p-10 bg-emerald-600 text-white flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-4">
+                <BookOpen size={32} className="md:w-12 md:h-12" />
+                <h3 className="text-2xl md:text-4xl font-black italic">使用教學指南</h3>
+              </div>
+              <button onClick={() => setShowGuideModal(false)} className="p-2 hover:bg-white/20 rounded-full transition-colors"><X size={32} /></button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-10 custom-scrollbar">
+              {GUIDE_STEPS.map((step, idx) => (
+                <div key={idx} className={`relative p-6 md:p-10 rounded-3xl border-2 transition-all ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className="absolute -top-6 -left-4 bg-emerald-600 text-white w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-xl md:text-3xl font-black shadow-xl">{idx + 1}</div>
+                  <h4 className="text-xl md:text-3xl font-black mb-4 md:mb-6 pl-6 md:pl-10 text-emerald-500">{step.title}</h4>
+                  <p className={`text-lg md:text-2xl font-bold leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>{step.content}</p>
+                </div>
+              ))}
+            </div>
+            <div className={`p-6 md:p-10 border-t shrink-0 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+              <button onClick={() => setShowGuideModal(false)} className="w-full py-4 md:py-6 bg-emerald-600 text-white rounded-2xl text-xl md:text-2xl font-black hover:bg-emerald-700 transition-all">我了解了，開始作業</button>
             </div>
           </div>
         </div>
