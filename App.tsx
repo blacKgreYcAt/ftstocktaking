@@ -693,7 +693,17 @@ const App: React.FC = () => {
               className="bg-transparent text-3xl md:text-5xl font-black text-blue-400 w-16 md:w-24 outline-none text-center"
               placeholder="1"
             />
-            <span className="text-slate-700 text-xl md:text-3xl font-black">X</span>
+            <button 
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setScanQty('');
+                qtyRef.current?.focus();
+              }}
+              className="text-slate-700 hover:text-red-500 transition-colors text-xl md:text-3xl font-black px-1"
+            >
+              X
+            </button>
           </div>
           <form onSubmit={handleScan} className="flex-1 relative ml-2 flex items-center">
             <Search className="absolute left-2 md:left-4 text-blue-500 w-6 h-6 md:w-12 md:h-12 pointer-events-none" />
