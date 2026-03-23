@@ -5,11 +5,10 @@ import {
   ScanBarcode, FileSpreadsheet, X,
   Link, Info, Package, ClipboardCheck, AlertCircle, PlusCircle, MapPin, Clock, User,
   Pause, Play, LogOut, Edit3, Hash, CloudSync, CloudCheck, CloudOff, Menu,
-  Camera, CameraOff, RefreshCw, AlertTriangle, Terminal, Bug,
+  CameraOff, RefreshCw, AlertTriangle, Terminal, Bug,
   Sun, Moon, BookOpen, ChevronRight
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { InventoryItem, LogEntry } from './types';
 import { audioService } from './services/audioService';
 
@@ -39,7 +38,7 @@ const GUIDE_STEPS = [
   },
   {
     title: "步驟 3：開始掃描盤點",
-    content: "確保「暫停」狀態已解除。在掃描框中輸入條碼或點擊相機圖示使用鏡頭掃描。系統會自動比對資料，累加實盤數量並即時計算庫存差異。"
+    content: "確保「暫停」狀態已解除。在掃描框中輸入條碼進行掃描。系統會自動比對資料，累加實盤數量並即時計算庫存差異。"
   },
   {
     title: "步驟 4：處理未知條碼",
@@ -79,7 +78,7 @@ const App: React.FC = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
 
-  // Refs to avoid stale closures in scanner callbacks
+  // Refs to avoid stale closures
   const dataRef = useRef(data);
   const configRef = useRef({ scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode });
 
@@ -88,12 +87,6 @@ const App: React.FC = () => {
     configRef.current = { scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode };
   }, [scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode]);
   
-  // Camera Scanner State
-  const [showScanner, setShowScanner] = useState(false);
-  const [cameraError, setCameraError] = useState('');
-  const scannerRef = useRef<Html5Qrcode | null>(null);
-  const scannerRegionId = "html5qr-code-full-region";
-
   const inputRef = useRef<HTMLInputElement>(null);
   const qtyRef = useRef<HTMLInputElement>(null);
   const locationRef = useRef<HTMLInputElement>(null);
@@ -171,10 +164,10 @@ const App: React.FC = () => {
     const active = document.activeElement;
     if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
 
-    if (inputRef.current && !showUnscannedList && !showMappingModal && !isPaused && !showScanner) {
+    if (inputRef.current && !showUnscannedList && !showMappingModal && !isPaused) {
       inputRef.current.focus();
     }
-  }, [showUnscannedList, showMappingModal, isPaused, showScanner]);
+  }, [showUnscannedList, showMappingModal, isPaused]);
 
   useEffect(() => {
     focusInput();
@@ -182,7 +175,6 @@ const App: React.FC = () => {
     window.addEventListener('click', h);
     return () => {
       window.removeEventListener('click', h);
-      stopScanner(); // Cleanup scanner on unmount
     };
   }, [focusInput]);
 
@@ -270,11 +262,6 @@ const App: React.FC = () => {
       setIsSuccess(true);
       audioService.speakSuccess('', 0);
       setTimeout(() => setIsSuccess(false), 300);
-      
-      // 如果是用相機掃的，掃完自動關閉
-      if (showScanner) {
-          stopScanner();
-      }
     } else {
       // 未知條碼
       addLog('error', `未知條碼: ${targetCode}`, { qty: currentAddQty });
@@ -284,9 +271,6 @@ const App: React.FC = () => {
       setIsCreatingNew(false);
       setShowMappingModal(true);
       audioService.speakError();
-      if (showScanner) {
-        stopScanner();
-      }
     }
   };
 
@@ -295,53 +279,6 @@ const App: React.FC = () => {
     e.preventDefault();
     processBarcode(inputValue);
     setInputValue('');
-  };
-
-  // --- 相機掃描邏輯 ---
-  const startScanner = () => {
-    setShowScanner(true);
-    setCameraError('');
-    
-    // 稍微延遲以確保 DOM 已渲染
-    setTimeout(() => {
-        const html5QrCode = new Html5Qrcode(scannerRegionId);
-        scannerRef.current = html5QrCode;
-        
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-        
-        // 優先使用後置鏡頭 environment
-        html5QrCode.start(
-            { facingMode: "environment" }, 
-            config, 
-            (decodedText) => {
-                // Scan Success
-                processBarcode(decodedText);
-            },
-            (errorMessage) => {
-                // parse error, ignore
-            }
-        ).catch(err => {
-            console.error("Camera Error", err);
-            let msg = "無法啟動相機。";
-            if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
-                msg = "安全限制：瀏覽器禁止在 HTTP 網頁使用相機。請參閱說明開啟權限。";
-            } else if (err?.name === 'NotAllowedError') {
-                msg = "請允許瀏覽器存取相機權限。";
-            }
-            setCameraError(msg);
-        });
-    }, 100);
-  };
-
-  const stopScanner = () => {
-      if (scannerRef.current) {
-          scannerRef.current.stop().then(() => {
-              scannerRef.current?.clear();
-              setShowScanner(false);
-          }).catch(err => console.error("Failed to stop scanner", err));
-      } else {
-          setShowScanner(false);
-      }
   };
 
   const manualSetTotalQty = () => {
@@ -520,46 +457,6 @@ const App: React.FC = () => {
     // Root: 手機版 min-h-screen 並允許捲動，電腦版 h-screen 並鎖定捲動
     <div className={`flex flex-col p-3 md:p-4 lg:p-6 select-none relative min-h-screen md:h-screen overflow-y-auto md:overflow-hidden transition-colors duration-500 ${isDarkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
       
-      {/* --- 相機掃描視窗 --- */}
-      {showScanner && (
-          <div className="fixed inset-0 z-[300] bg-black flex flex-col items-center justify-center">
-              <div className="relative w-full max-w-md aspect-[3/4] bg-black">
-                  <div id={scannerRegionId} className="w-full h-full"></div>
-                  {/* 掃描框遮罩視覺效果 */}
-                  {!cameraError && (
-                    <div className="absolute inset-0 pointer-events-none border-[50px] border-black/50 flex items-center justify-center">
-                        <div className="w-64 h-64 border-4 border-blue-500/50 rounded-lg relative animate-pulse">
-                            <div className="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-blue-400"></div>
-                            <div className="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-blue-400"></div>
-                            <div className="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-blue-400"></div>
-                            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-blue-400"></div>
-                        </div>
-                    </div>
-                  )}
-                  {/* 錯誤訊息顯示 */}
-                  {cameraError && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-slate-900">
-                          <AlertTriangle size={64} className="text-amber-500 mb-4" />
-                          <h3 className="text-2xl font-bold text-white mb-2">無法開啟相機</h3>
-                          <p className="text-slate-300 text-lg mb-6">{cameraError}</p>
-                          <div className="text-sm text-slate-500 bg-slate-800 p-4 rounded-xl text-left">
-                              <p className="mb-2 font-bold">解決方案 (Chrome):</p>
-                              <ol className="list-decimal pl-5 space-y-1">
-                                  <li>網址列輸入: <code className="text-blue-400">chrome://flags</code></li>
-                                  <li>搜尋 <code className="text-blue-400">unsafely-treat-insecure-origin-as-secure</code></li>
-                                  <li>設為 <b>Enabled</b> 並在下方填入本機 IP</li>
-                                  <li>重啟瀏覽器</li>
-                              </ol>
-                          </div>
-                      </div>
-                  )}
-              </div>
-              <button onClick={stopScanner} className="mt-8 bg-slate-800 hover:bg-slate-700 text-white px-8 py-4 rounded-full text-2xl font-black flex items-center gap-3 transition-all border border-slate-700">
-                  <X size={32} /> 關閉相機
-              </button>
-          </div>
-      )}
-
       {isPaused && (
         <div onClick={togglePause} className={`fixed inset-0 z-[200] backdrop-blur-md flex flex-col items-center justify-center cursor-pointer group animate-in fade-in duration-300 ${isDarkMode ? 'bg-slate-950/80' : 'bg-white/80'}`}>
           <div className="bg-amber-600 p-6 md:p-10 rounded-full md:rounded-[3rem] shadow-[0_0_80px_rgba(217,119,6,0.3)] group-hover:scale-110 transition-transform mb-4 md:mb-8">
@@ -777,20 +674,9 @@ const App: React.FC = () => {
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={isPaused ? "暫停..." : data.length > 0 ? "掃描..." : "請先匯入"}
               disabled={data.length === 0 || isPaused}
-              className={`w-full bg-transparent pl-9 md:pl-16 lg:pl-24 pr-14 md:pr-4 py-3 md:py-6 lg:py-12 text-2xl md:text-5xl lg:text-7xl font-black outline-none h-14 md:h-24 lg:h-auto ${isDarkMode ? 'text-white placeholder:text-slate-800' : 'text-slate-900 placeholder:text-slate-400'}`}
+              className={`w-full bg-transparent pl-9 md:pl-16 lg:pl-24 pr-4 py-3 md:py-6 lg:py-12 text-2xl md:text-5xl lg:text-7xl font-black outline-none h-14 md:h-24 lg:h-auto ${isDarkMode ? 'text-white placeholder:text-slate-800' : 'text-slate-900 placeholder:text-slate-400'}`}
               autoComplete="off"
             />
-            
-            {/* 掃描按鈕 (顯示於輸入框右側) */}
-            <button 
-                type="button" 
-                onClick={startScanner}
-                disabled={data.length === 0 || isPaused}
-                className={`absolute right-0 md:static md:ml-4 lg:ml-8 p-2.5 md:p-6 lg:p-10 rounded-full md:rounded-3xl lg:rounded-[2.5rem] transition-all border shadow-lg disabled:opacity-30 disabled:cursor-not-allowed ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'}`}
-                title="開啟相機掃描"
-            >
-                <Camera size={20} className="md:w-10 md:h-10 lg:w-[64px] lg:h-[64px]" />
-            </button>
           </form>
         </section>
 
@@ -844,15 +730,15 @@ const App: React.FC = () => {
         {/* 下方/右方：數量統計 */}
         <div className="col-span-1 lg:col-span-4 flex flex-row lg:flex-col gap-4 md:gap-6 lg:gap-8 h-32 md:h-40 lg:h-auto">
           <div className="flex-1 bg-blue-600 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col items-center justify-center shadow-2xl relative p-3 md:p-4">
-            <span className="text-blue-100 font-black text-sm md:text-xl lg:text-2xl mb-1 md:mb-2 lg:mb-4 uppercase tracking-[0.2em] md:tracking-[0.4em]">累計數量</span>
-            <div className="text-3xl md:text-5xl lg:text-7xl font-black drop-shadow-2xl text-white leading-none">{lastScanned?.actualQty ?? '0'}</div>
+            <span className="text-blue-100 font-black text-base md:text-2xl lg:text-4xl mb-1 md:mb-2 lg:mb-4 uppercase tracking-[0.2em] md:tracking-[0.4em]">累計數量</span>
+            <div className="text-4xl md:text-7xl lg:text-9xl font-black drop-shadow-2xl text-white leading-none">{lastScanned?.actualQty ?? '0'}</div>
             {lastScanned && (
               <button onClick={manualSetTotalQty} className={`absolute bottom-2 right-2 md:bottom-6 md:right-6 lg:bottom-10 lg:right-10 px-2 py-1 md:px-4 md:py-2 lg:px-6 lg:py-4 rounded-lg md:rounded-2xl lg:rounded-3xl transition-all flex items-center gap-1 md:gap-2 lg:gap-3 text-xs md:text-xl lg:text-2xl font-black backdrop-blur-md shadow-2xl border-2 ${isDarkMode ? 'bg-white/20 hover:bg-white text-white hover:text-blue-600 border-white/20' : 'bg-blue-700/20 hover:bg-blue-700 text-blue-700 hover:text-white border-blue-700/20'}`}><Edit3 size={14} className="md:w-6 md:h-6 lg:w-[32px] lg:h-[32px]" /> 修正</button>
             )}
           </div>
           <div className={`flex-1 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col items-center justify-center shadow-2xl transition-all duration-500 p-3 md:p-4 ${!lastScanned ? (isDarkMode ? 'bg-slate-800 text-slate-700' : 'bg-slate-100 text-slate-600') : lastScanned.diff === 0 ? 'bg-emerald-600' : 'bg-red-600'}`}>
-            <span className={`font-black text-sm md:text-xl lg:text-2xl mb-1 md:mb-2 lg:mb-4 uppercase tracking-[0.2em] md:tracking-[0.4em] ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white opacity-80'}`}>庫存差異</span>
-            <div className={`text-3xl md:text-5xl lg:text-7xl font-black leading-none ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white'}`}>{lastScanned ? (lastScanned.diff > 0 ? `+${lastScanned.diff}` : lastScanned.diff) : '0'}</div>
+            <span className={`font-black text-base md:text-2xl lg:text-4xl mb-1 md:mb-2 lg:mb-4 uppercase tracking-[0.2em] md:tracking-[0.4em] ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white opacity-80'}`}>庫存差異</span>
+            <div className={`text-4xl md:text-7xl lg:text-9xl font-black leading-none ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white'}`}>{lastScanned ? (lastScanned.diff > 0 ? `+${lastScanned.diff}` : lastScanned.diff) : '0'}</div>
           </div>
         </div>
       </main>
