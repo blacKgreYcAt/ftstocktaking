@@ -480,26 +480,26 @@ const App: React.FC = () => {
 
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 md:mb-3 lg:mb-4 shrink-0 gap-2 md:gap-0">
         <div className="w-full md:w-auto pb-1 md:pb-0">
-          <div className="flex flex-wrap gap-0.5 md:gap-1 lg:gap-1.5 items-stretch">
+          <div className="flex flex-wrap gap-1 md:gap-1.5 lg:gap-2 items-stretch">
             
             <div className="flex flex-col gap-0.5">
-              <span className={`text-[8px] md:text-[10px] lg:text-xs font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>主題</span>
-              <div className={`h-9 md:h-12 lg:h-14 flex items-center gap-0.5 p-0.5 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>主題</span>
+              <div className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 p-1 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className={`flex p-0.5 rounded-md border h-full ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
-                  <button onClick={() => setIsDarkMode(true)} className={`px-1 md:px-1.5 lg:px-2 rounded-sm md:rounded-lg text-[8px] md:text-[10px] lg:text-xs font-black transition-all flex items-center gap-0.5 ${isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
-                    <Moon size={10} className="md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" /> 黑色
+                  <button onClick={() => setIsDarkMode(true)} className={`px-1.5 md:px-3 lg:px-4 rounded-sm md:rounded-lg text-[10px] md:text-xs lg:text-sm font-black transition-all flex items-center gap-1 ${isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                    <Moon size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 黑色
                   </button>
-                  <button onClick={() => setIsDarkMode(false)} className={`px-1 md:px-1.5 lg:px-2 rounded-sm md:rounded-lg text-[8px] md:text-[10px] lg:text-xs font-black transition-all flex items-center gap-0.5 ${!isDarkMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
-                    <Sun size={10} className="md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" /> 白色
+                  <button onClick={() => setIsDarkMode(false)} className={`px-1.5 md:px-3 lg:px-4 rounded-sm md:rounded-lg text-[10px] md:text-xs lg:text-sm font-black transition-all flex items-center gap-1 ${!isDarkMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                    <Sun size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 白色
                   </button>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className={`text-[8px] md:text-[10px] lg:text-xs font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-blue-500' : 'text-blue-800'}`}>S1. 匯入</span>
-              <label className={`h-9 md:h-12 lg:h-14 flex items-center gap-1 px-1 md:px-2 lg:px-3 rounded-lg cursor-pointer text-[10px] md:text-sm lg:text-base font-black transition-all shadow-sm border ${data.length === 0 ? 'bg-blue-600 border-blue-400 hover:bg-blue-700 animate-pulse text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:border-blue-500' : 'bg-white border-slate-300 text-slate-700 hover:border-blue-600 shadow-sm')}`}>
-                 <FileSpreadsheet size={12} className="md:w-3.5 md:h-3.5 lg:w-4.5 lg:h-4.5" /> 
+              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-blue-500' : 'text-blue-800'}`}>S1. 匯入</span>
+              <label className={`h-11 md:h-16 lg:h-20 flex items-center gap-1.5 px-2 md:px-4 lg:px-6 rounded-lg cursor-pointer text-xs md:text-xl lg:text-2xl font-black transition-all shadow-sm border ${data.length === 0 ? 'bg-blue-600 border-blue-400 hover:bg-blue-700 animate-pulse text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:border-blue-500' : 'bg-white border-slate-300 text-slate-700 hover:border-blue-600 shadow-sm')}`}>
+                 <FileSpreadsheet size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6" /> 
                  {data.length === 0 ? "匯入" : "重讀"}
                  <input type="file" accept=".csv, .xlsx" onChange={(e) => {
                    const file = e.target.files?.[0]; if (!file) return;
@@ -526,76 +526,76 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className={`text-[8px] md:text-[10px] lg:text-xs font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>S2. 人員/倉庫</span>
-              <div className={`h-9 md:h-12 lg:h-14 flex items-center border rounded-lg focus-within:border-blue-500 transition-all px-1 md:px-2 lg:px-3 gap-1 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>S2. 人員/倉庫</span>
+              <div className={`h-11 md:h-16 lg:h-20 flex items-center border rounded-lg focus-within:border-blue-500 transition-all px-2 md:px-4 lg:px-6 gap-2 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className="flex flex-col">
-                  <div className="flex items-center gap-1">
-                    <User size={10} className="text-slate-600 md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" />
-                    <input type="text" value={operatorName} onChange={(e) => setOperatorName(e.target.value)} placeholder="姓名" className={`bg-transparent text-[10px] md:text-lg lg:text-xl font-black outline-none w-10 md:w-20 lg:w-24 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
+                  <div className="flex items-center gap-1.5">
+                    <User size={12} className="text-slate-600 md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    <input type="text" value={operatorName} onChange={(e) => setOperatorName(e.target.value)} placeholder="姓名" className={`bg-transparent text-xs md:text-xl lg:text-2xl font-black outline-none w-12 md:w-24 lg:w-32 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
                   </div>
-                  <div className={`flex items-center gap-1 border-t mt-0.5 pt-0.5 ${isDarkMode ? 'border-slate-800' : 'border-slate-300'}`}>
-                    <Package size={10} className="text-slate-600 md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" />
-                    <input type="text" value={warehouseCode} onChange={(e) => setWarehouseCode(e.target.value)} placeholder="倉庫" className={`bg-transparent text-[10px] md:text-lg lg:text-xl font-black outline-none w-10 md:w-20 lg:w-24 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
+                  <div className={`flex items-center gap-1.5 border-t mt-1 pt-1 ${isDarkMode ? 'border-slate-800' : 'border-slate-300'}`}>
+                    <Package size={12} className="text-slate-600 md:w-4 md:h-4 lg:w-5 lg:h-5" />
+                    <input type="text" value={warehouseCode} onChange={(e) => setWarehouseCode(e.target.value)} placeholder="倉庫" className={`bg-transparent text-xs md:text-xl lg:text-2xl font-black outline-none w-12 md:w-24 lg:w-32 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className={`text-[8px] md:text-[10px] lg:text-xs font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>S3. 設定</span>
-              <div className={`h-9 md:h-12 lg:h-14 flex items-center gap-0.5 p-0.5 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>S3. 設定</span>
+              <div className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 p-1 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className={`flex p-0.5 rounded-md border h-full ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
-                  <button onClick={() => setTimeFormat('date')} className={`px-1 md:px-1.5 lg:px-2 rounded-sm md:rounded-lg text-[8px] md:text-[10px] lg:text-xs font-black transition-all ${timeFormat === 'date' ? (isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'bg-slate-300 text-slate-900 shadow-sm') : 'text-slate-600 hover:text-slate-900'}`}>日期</button>
-                  <button onClick={() => setTimeFormat('datetime')} className={`px-1 md:px-1.5 lg:px-2 rounded-sm md:rounded-lg text-[8px] md:text-[10px] lg:text-xs font-black transition-all flex items-center gap-0.5 ${timeFormat === 'datetime' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Clock size={10} className="md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" />時間</button>
+                  <button onClick={() => setTimeFormat('date')} className={`px-1.5 md:px-3 lg:px-4 rounded-sm md:rounded-lg text-[10px] md:text-xs lg:text-sm font-black transition-all ${timeFormat === 'date' ? (isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'bg-slate-300 text-slate-900 shadow-sm') : 'text-slate-600 hover:text-slate-900'}`}>日期</button>
+                  <button onClick={() => setTimeFormat('datetime')} className={`px-1.5 md:px-3 lg:px-4 rounded-sm md:rounded-lg text-[10px] md:text-xs lg:text-sm font-black transition-all flex items-center gap-1 ${timeFormat === 'datetime' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Clock size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />時間</button>
                 </div>
-                <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-0.5 px-1 md:px-2 lg:px-3 rounded-md md:rounded-lg transition-all font-black text-[8px] md:text-[10px] lg:text-xs border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={10} className="md:w-3.5 md:h-3.5 lg:w-4.5 lg:h-4.5" />儲位</button>
+                <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-xs lg:text-sm border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={12} className="md:w-5 md:h-5 lg:w-6 lg:h-6" />儲位</button>
               </div>
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className={`text-[8px] md:text-[10px] lg:text-xs font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>除錯</span>
-              <div className={`h-9 md:h-12 lg:h-14 flex items-center gap-0.5 p-0.5 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>除錯</span>
+              <div className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 p-1 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <button onClick={handleExportLogs} title="匯出紀錄" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
-                  <Bug size={12} className="md:w-3.5 md:h-3.5 lg:w-4.5 lg:h-4.5" />
+                  <Bug size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 </button>
                 <button onClick={handleClearLogs} title="清除紀錄" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-400' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-red-500'}`}>
-                  <RefreshCw size={12} className="md:w-3.5 md:h-3.5 lg:w-4.5 lg:h-4.5" />
+                  <RefreshCw size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 </button>
                 <button onClick={handleClearAllData} title="重設所有資料" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-600' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-red-600'}`}>
-                  <X size={12} className="md:w-3.5 md:h-3.5 lg:w-4.5 lg:h-4.5" />
+                  <X size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 </button>
               </div>
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className={`text-[8px] md:text-[10px] lg:text-xs font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>資訊</span>
-              <div className={`h-9 md:h-12 lg:h-14 flex items-center gap-0.5 p-0.5 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
-                <button onClick={() => setShowUpdateModal(true)} className={`h-full flex items-center gap-0.5 px-1 md:px-2 lg:px-3 rounded-md md:rounded-lg transition-all font-black text-[8px] md:text-[10px] lg:text-xs border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
-                  <Info size={10} className="md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" /> 更新
+              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>資訊</span>
+              <div className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 p-1 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+                <button onClick={() => setShowUpdateModal(true)} className={`h-full flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-xs lg:text-sm border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
+                  <Info size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 更新
                 </button>
-                <button onClick={() => setShowGuideModal(true)} className={`h-full flex items-center gap-0.5 px-1 md:px-2 lg:px-3 rounded-md md:rounded-lg transition-all font-black text-[8px] md:text-[10px] lg:text-xs border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
-                  <BookOpen size={10} className="md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" /> 教學
+                <button onClick={() => setShowGuideModal(true)} className={`h-full flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-xs lg:text-sm border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
+                  <BookOpen size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 教學
                 </button>
               </div>
             </div>
 
-            <div className={`w-px mx-0.5 self-center h-6 md:h-8 lg:h-10 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-300'}`} />
+            <div className={`w-px mx-1 self-center h-8 md:h-12 lg:h-14 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-300'}`} />
 
             <div className="flex flex-col gap-0.5">
-              <span className="text-[8px] md:text-[10px] lg:text-xs font-black text-amber-500 uppercase tracking-tight pl-1">S4. 暫停</span>
-              <button onClick={togglePause} disabled={data.length === 0} className={`h-9 md:h-12 lg:h-14 flex items-center justify-center px-1.5 md:px-3 lg:px-4 rounded-lg text-xs md:text-lg lg:text-xl font-black transition-all shadow-sm border ${isPaused ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-amber-500 hover:bg-slate-800' : 'bg-white border-slate-300 text-amber-600 hover:bg-slate-100')} disabled:opacity-30`}>
-                {isPaused ? <Play size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> : <Pause size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />}
+              <span className="text-[10px] md:text-xs lg:text-sm font-black text-amber-500 uppercase tracking-tight pl-1">S4. 暫停</span>
+              <button onClick={togglePause} disabled={data.length === 0} className={`h-11 md:h-16 lg:h-20 flex items-center justify-center px-2 md:px-5 lg:px-8 rounded-lg text-sm md:text-2xl lg:text-3xl font-black transition-all shadow-sm border ${isPaused ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-amber-500 hover:bg-slate-800' : 'bg-white border-slate-300 text-amber-600 hover:bg-slate-100')} disabled:opacity-30`}>
+                {isPaused ? <Play size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8" /> : <Pause size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8" />}
               </button>
             </div>
 
             <div className="flex flex-col gap-0.5">
-              <span className="text-[8px] md:text-[10px] lg:text-xs font-black text-red-500 uppercase tracking-tight pl-1">S5. 結束</span>
-              <div className="flex gap-0.5 md:gap-1">
-                <button onClick={handleEndJob} disabled={data.length === 0} className={`h-9 md:h-12 lg:h-14 flex items-center gap-0.5 px-1 md:px-2 lg:px-3 rounded-lg text-[10px] md:text-base lg:text-lg font-black transition-all shadow-sm border ${data.length > 0 ? 'bg-red-600 border-red-400 hover:bg-red-700 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-700' : 'bg-white border-slate-300 text-slate-400 cursor-not-allowed')}`} title="匯出 Excel 並結束">
-                  <LogOut size={10} className="md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" /> 結束
+              <span className="text-[10px] md:text-xs lg:text-sm font-black text-red-500 uppercase tracking-tight pl-1">S5. 結束</span>
+              <div className="flex gap-1 md:gap-1.5">
+                <button onClick={handleEndJob} disabled={data.length === 0} className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-lg text-xs md:text-xl lg:text-2xl font-black transition-all shadow-sm border ${data.length > 0 ? 'bg-red-600 border-red-400 hover:bg-red-700 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-700' : 'bg-white border-slate-300 text-slate-400 cursor-not-allowed')}`} title="匯出 Excel 並結束">
+                  <LogOut size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 結束
                 </button>
-                <button onClick={handleExportMachineFormat} disabled={data.length === 0} className={`h-9 md:h-12 lg:h-14 flex items-center gap-0.5 px-1 md:px-2 lg:px-3 rounded-lg text-[10px] md:text-base lg:text-lg font-black transition-all shadow-sm border ${data.length > 0 ? 'bg-indigo-600 border-indigo-400 hover:bg-indigo-700 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-700' : 'bg-white border-slate-300 text-slate-400 cursor-not-allowed')}`} title="匯出盤點機 TXT 格式">
-                  <FileDown size={10} className="md:w-2.5 md:h-2.5 lg:w-3.5 lg:h-3.5" /> TXT
+                <button onClick={handleExportMachineFormat} disabled={data.length === 0} className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-lg text-xs md:text-xl lg:text-2xl font-black transition-all shadow-sm border ${data.length > 0 ? 'bg-indigo-600 border-indigo-400 hover:bg-indigo-700 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-700' : 'bg-white border-slate-300 text-slate-400 cursor-not-allowed')}`} title="匯出盤點機 TXT 格式">
+                  <FileDown size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> TXT
                 </button>
               </div>
             </div>
@@ -603,8 +603,8 @@ const App: React.FC = () => {
         </div>
 
         <div className="hidden md:flex flex-col items-end text-right pb-1">
-            <h1 className="text-xs lg:text-base font-black tracking-tighter text-white leading-none mb-1 whitespace-nowrap">大豐資訊盤點系統</h1>
-            <div className="bg-blue-600/20 text-blue-500 font-bold px-2 py-0.5 rounded-full text-[8px] lg:text-[10px] tracking-widest uppercase border border-blue-500/30">雲端備份就緒</div>
+            <h1 className="text-xs md:text-sm lg:text-base font-black tracking-tighter text-white leading-none mb-1 whitespace-nowrap">大豐資訊盤點系統</h1>
+            <div className="bg-blue-600/20 text-blue-500 font-bold px-2 py-0.5 rounded-full text-[10px] lg:text-xs tracking-widest uppercase border border-blue-500/30">雲端備份就緒</div>
         </div>
         {/* 手機版標題簡化 */}
         <div className="md:hidden w-full flex justify-between items-center mt-1 px-1">
