@@ -567,13 +567,13 @@ const App: React.FC = () => {
           <div className="flex gap-4 md:gap-8 lg:gap-12 items-stretch min-w-max">
             
             <div className="flex flex-col gap-1 md:gap-3 lg:gap-6">
-              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>主題切換</span>
+              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>主題切換</span>
               <div className={`h-16 md:h-24 lg:h-36 flex items-center gap-2 md:gap-4 p-2 md:p-4 rounded-xl md:rounded-3xl lg:rounded-[3rem] border-2 md:border-4 lg:border-[8px] ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className={`flex p-1.5 rounded-xl border h-full ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
-                  <button onClick={() => setIsDarkMode(true)} className={`px-3 md:px-8 lg:px-14 rounded-lg md:rounded-2xl lg:rounded-3xl text-xs md:text-xl lg:text-3xl font-black transition-all flex items-center gap-1 md:gap-4 ${isDarkMode ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-700'}`}>
+                  <button onClick={() => setIsDarkMode(true)} className={`px-3 md:px-8 lg:px-14 rounded-lg md:rounded-2xl lg:rounded-3xl text-xs md:text-xl lg:text-3xl font-black transition-all flex items-center gap-1 md:gap-4 ${isDarkMode ? 'bg-slate-800 text-white shadow-lg' : 'text-slate-600 hover:text-slate-900'}`}>
                     <Moon size={16} className="md:w-6 md:h-6 lg:w-10 lg:h-10" /> 黑色
                   </button>
-                  <button onClick={() => setIsDarkMode(false)} className={`px-3 md:px-8 lg:px-14 rounded-lg md:rounded-2xl lg:rounded-3xl text-xs md:text-xl lg:text-3xl font-black transition-all flex items-center gap-1 md:gap-4 ${!isDarkMode ? 'bg-white text-slate-900 shadow-md' : 'text-slate-600 hover:text-slate-800'}`}>
+                  <button onClick={() => setIsDarkMode(false)} className={`px-3 md:px-8 lg:px-14 rounded-lg md:rounded-2xl lg:rounded-3xl text-xs md:text-xl lg:text-3xl font-black transition-all flex items-center gap-1 md:gap-4 ${!isDarkMode ? 'bg-white text-slate-900 shadow-md' : 'text-slate-600 hover:text-slate-900'}`}>
                     <Sun size={16} className="md:w-6 md:h-6 lg:w-10 lg:h-10" /> 白色
                   </button>
                 </div>
@@ -581,8 +581,8 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-1 md:gap-3 lg:gap-6">
-              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-blue-500' : 'text-blue-700'}`}>STEP 1. 匯入</span>
-              <label className={`h-16 md:h-24 lg:h-36 flex items-center gap-2 md:gap-6 px-6 md:px-12 lg:px-20 rounded-xl md:rounded-3xl lg:rounded-[3rem] cursor-pointer text-sm md:text-3xl lg:text-5xl font-black transition-all shadow-xl border-2 md:border-4 lg:border-[8px] ${data.length === 0 ? 'bg-blue-600 border-blue-400 hover:bg-blue-700 animate-pulse' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:border-blue-500' : 'bg-white border-slate-300 text-slate-600 hover:border-blue-600 shadow-sm')}`}>
+              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-blue-500' : 'text-blue-800'}`}>STEP 1. 匯入</span>
+              <label className={`h-16 md:h-24 lg:h-36 flex items-center gap-2 md:gap-6 px-6 md:px-12 lg:px-20 rounded-xl md:rounded-3xl lg:rounded-[3rem] cursor-pointer text-sm md:text-3xl lg:text-5xl font-black transition-all shadow-xl border-2 md:border-4 lg:border-[8px] ${data.length === 0 ? 'bg-blue-600 border-blue-400 hover:bg-blue-700 animate-pulse' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:border-blue-500' : 'bg-white border-slate-300 text-slate-700 hover:border-blue-600 shadow-sm')}`}>
                  <FileSpreadsheet size={24} className="md:w-10 md:h-10 lg:w-16 lg:h-16" /> 
                  {data.length === 0 ? "匯入" : "重讀"}
                  <input type="file" accept=".csv, .xlsx" onChange={(e) => {
@@ -610,15 +610,15 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-1 md:gap-3 lg:gap-6">
-              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>STEP 2. 人員/倉庫</span>
+              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>STEP 2. 人員/倉庫</span>
               <div className={`h-16 md:h-24 lg:h-36 flex items-center border-2 md:border-4 lg:border-[8px] rounded-xl md:rounded-3xl lg:rounded-[3rem] focus-within:border-blue-500 transition-all px-4 md:px-10 lg:px-16 gap-2 md:gap-6 lg:gap-10 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1 md:gap-4">
-                    <User size={14} className="text-slate-500 md:w-6 md:h-6 lg:w-10 lg:h-10" />
+                    <User size={14} className="text-slate-600 md:w-6 md:h-6 lg:w-10 lg:h-10" />
                     <input type="text" value={operatorName} onChange={(e) => setOperatorName(e.target.value)} placeholder="姓名" className={`bg-transparent text-sm md:text-2xl lg:text-4xl font-black outline-none w-16 md:w-40 lg:w-64 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
                   </div>
                   <div className={`flex items-center gap-1 md:gap-4 border-t mt-1 pt-1 md:mt-3 md:pt-3 ${isDarkMode ? 'border-slate-800' : 'border-slate-300'}`}>
-                    <Package size={14} className="text-slate-500 md:w-6 md:h-6 lg:w-10 lg:h-10" />
+                    <Package size={14} className="text-slate-600 md:w-6 md:h-6 lg:w-10 lg:h-10" />
                     <input type="text" value={warehouseCode} onChange={(e) => setWarehouseCode(e.target.value)} placeholder="倉庫" className={`bg-transparent text-sm md:text-2xl lg:text-4xl font-black outline-none w-16 md:w-40 lg:w-64 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
                   </div>
                 </div>
@@ -626,26 +626,26 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-1 md:gap-3 lg:gap-6">
-              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>STEP 3. 設定</span>
+              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>STEP 3. 設定</span>
               <div className={`h-16 md:h-24 lg:h-36 flex items-center gap-2 md:gap-6 p-2 md:p-4 rounded-xl md:rounded-3xl lg:rounded-[3rem] border-2 md:border-4 lg:border-[8px] ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className={`flex p-1.5 rounded-xl border h-full ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
-                  <button onClick={() => setTimeFormat('date')} className={`px-3 md:px-8 lg:px-14 rounded-lg md:rounded-2xl lg:rounded-3xl text-xs md:text-xl lg:text-3xl font-black transition-all ${timeFormat === 'date' ? (isDarkMode ? 'bg-slate-700 text-white shadow-lg' : 'bg-slate-200 text-slate-900 shadow-md') : 'text-slate-600 hover:text-slate-800'}`}>日期</button>
-                  <button onClick={() => setTimeFormat('datetime')} className={`px-3 md:px-8 lg:px-14 rounded-lg md:rounded-2xl lg:rounded-3xl text-xs md:text-xl lg:text-3xl font-black transition-all flex items-center gap-1 md:gap-4 ${timeFormat === 'datetime' ? 'bg-indigo-600 text-white shadow-xl' : 'text-slate-600 hover:text-slate-800'}`}><Clock size={14} className="md:w-6 md:h-6 lg:w-10 lg:h-10" />時間</button>
+                  <button onClick={() => setTimeFormat('date')} className={`px-3 md:px-8 lg:px-14 rounded-lg md:rounded-2xl lg:rounded-3xl text-xs md:text-xl lg:text-3xl font-black transition-all ${timeFormat === 'date' ? (isDarkMode ? 'bg-slate-700 text-white shadow-lg' : 'bg-slate-300 text-slate-900 shadow-md') : 'text-slate-600 hover:text-slate-900'}`}>日期</button>
+                  <button onClick={() => setTimeFormat('datetime')} className={`px-3 md:px-8 lg:px-14 rounded-lg md:rounded-2xl lg:rounded-3xl text-xs md:text-xl lg:text-3xl font-black transition-all flex items-center gap-1 md:gap-4 ${timeFormat === 'datetime' ? 'bg-indigo-600 text-white shadow-xl' : 'text-slate-600 hover:text-slate-900'}`}><Clock size={14} className="md:w-6 md:h-6 lg:w-10 lg:h-10" />時間</button>
                 </div>
-                <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-1 md:gap-4 lg:gap-8 px-4 md:px-10 lg:px-16 rounded-xl md:rounded-3xl lg:rounded-[2rem] transition-all font-black text-xs md:text-2xl lg:text-4xl border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-500')}`}><MapPin size={16} className="md:w-10 md:h-10 lg:w-14 lg:h-14" />儲位</button>
+                <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-1 md:gap-4 lg:gap-8 px-4 md:px-10 lg:px-16 rounded-xl md:rounded-3xl lg:rounded-[2rem] transition-all font-black text-xs md:text-2xl lg:text-4xl border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={16} className="md:w-10 md:h-10 lg:w-14 lg:h-14" />儲位</button>
               </div>
             </div>
 
             <div className="flex flex-col gap-1 md:gap-3 lg:gap-6">
-              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>除錯</span>
+              <span className={`text-xs md:text-xl lg:text-3xl font-black uppercase tracking-widest pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>除錯</span>
               <div className={`h-16 md:h-24 lg:h-36 flex items-center gap-2 md:gap-6 p-2 md:p-4 rounded-xl md:rounded-3xl lg:rounded-[3rem] border-2 md:border-4 lg:border-[8px] ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
-                <button onClick={handleExportLogs} title="匯出紀錄" className={`h-full flex items-center justify-center aspect-square rounded-xl md:rounded-2xl lg:rounded-3xl transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200'}`}>
+                <button onClick={handleExportLogs} title="匯出紀錄" className={`h-full flex items-center justify-center aspect-square rounded-xl md:rounded-2xl lg:rounded-3xl transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
                   <Bug size={18} className="md:w-10 md:h-10 lg:w-16 lg:h-16" />
                 </button>
-                <button onClick={handleClearLogs} title="清除紀錄" className={`h-full flex items-center justify-center aspect-square rounded-xl md:rounded-2xl lg:rounded-3xl transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-400' : 'bg-slate-100 border-slate-300 text-slate-600 hover:text-red-500'}`}>
+                <button onClick={handleClearLogs} title="清除紀錄" className={`h-full flex items-center justify-center aspect-square rounded-xl md:rounded-2xl lg:rounded-3xl transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-400' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-red-500'}`}>
                   <RefreshCw size={18} className="md:w-10 md:h-10 lg:w-16 lg:h-16" />
                 </button>
-                <button onClick={handleClearAllData} title="重設所有資料" className={`h-full flex items-center justify-center aspect-square rounded-xl md:rounded-2xl lg:rounded-3xl transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-600' : 'bg-slate-100 border-slate-300 text-slate-600 hover:text-red-600'}`}>
+                <button onClick={handleClearAllData} title="重設所有資料" className={`h-full flex items-center justify-center aspect-square rounded-xl md:rounded-2xl lg:rounded-3xl transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-600' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-red-600'}`}>
                   <X size={18} className="md:w-10 md:h-10 lg:w-16 lg:h-16" />
                 </button>
               </div>
@@ -685,9 +685,9 @@ const App: React.FC = () => {
 
       {/* 掃描列 */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-6 lg:gap-8 mb-4 md:mb-6 lg:mb-10 shrink-0">
-        <section className={`flex-1 flex p-2 md:p-3 lg:p-4 rounded-2xl md:rounded-3xl lg:rounded-[4rem] transition-all duration-300 border-2 md:border-4 lg:border-[8px] items-center ${isSuccess ? 'bg-emerald-500/20 border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]' : isPaused ? 'bg-slate-950 border-slate-900' : 'bg-slate-900 border-slate-800 focus-within:border-blue-500'}`}>
+        <section className={`flex-1 flex p-2 md:p-3 lg:p-4 rounded-2xl md:rounded-3xl lg:rounded-[4rem] transition-all duration-300 border-2 md:border-4 lg:border-[8px] items-center ${isSuccess ? 'bg-emerald-500/20 border-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]' : isPaused ? (isDarkMode ? 'bg-slate-950 border-slate-900' : 'bg-slate-100 border-slate-200') : (isDarkMode ? 'bg-slate-900 border-slate-800 focus-within:border-blue-500' : 'bg-white border-slate-300 focus-within:border-blue-600 shadow-sm')}`}>
           <div 
-            className="flex items-center bg-slate-950 rounded-xl md:rounded-2xl lg:rounded-[3rem] px-3 md:px-6 lg:px-10 gap-2 md:gap-4 lg:gap-6 ml-1 md:ml-2 lg:ml-4 border border-slate-800 shadow-inner cursor-text py-2 md:py-2 lg:py-2"
+            className={`flex items-center rounded-xl md:rounded-2xl lg:rounded-[3rem] px-3 md:px-6 lg:px-10 gap-2 md:gap-4 lg:gap-6 ml-1 md:ml-2 lg:ml-4 border shadow-inner cursor-text py-2 md:py-2 lg:py-2 ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}
             onClick={(e) => {
               e.stopPropagation(); 
               qtyRef.current?.focus();
@@ -707,7 +707,7 @@ const App: React.FC = () => {
                 }
               }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-transparent text-2xl md:text-4xl lg:text-6xl font-black text-blue-400 w-12 md:w-20 lg:w-32 outline-none text-center"
+              className={`bg-transparent text-2xl md:text-4xl lg:text-6xl font-black w-12 md:w-20 lg:w-32 outline-none text-center ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}
               placeholder="1"
             />
             <button 
@@ -717,7 +717,7 @@ const App: React.FC = () => {
                 setScanQty('');
                 qtyRef.current?.focus();
               }}
-              className="text-slate-700 hover:text-red-500 transition-colors text-lg md:text-3xl lg:text-4xl font-black px-1"
+              className={`transition-colors text-lg md:text-3xl lg:text-4xl font-black px-1 ${isDarkMode ? 'text-slate-700 hover:text-red-500' : 'text-slate-400 hover:text-red-600'}`}
             >
               X
             </button>
@@ -731,7 +731,7 @@ const App: React.FC = () => {
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={isPaused ? "暫停..." : data.length > 0 ? "掃描..." : "請先匯入"}
               disabled={data.length === 0 || isPaused}
-              className="w-full bg-transparent pl-9 md:pl-16 lg:pl-24 pr-14 md:pr-4 py-3 md:py-6 lg:py-12 text-2xl md:text-5xl lg:text-7xl font-black text-white outline-none placeholder:text-slate-800 h-14 md:h-24 lg:h-auto"
+              className={`w-full bg-transparent pl-9 md:pl-16 lg:pl-24 pr-14 md:pr-4 py-3 md:py-6 lg:py-12 text-2xl md:text-5xl lg:text-7xl font-black outline-none h-14 md:h-24 lg:h-auto ${isDarkMode ? 'text-white placeholder:text-slate-800' : 'text-slate-900 placeholder:text-slate-400'}`}
               autoComplete="off"
             />
             
@@ -740,7 +740,7 @@ const App: React.FC = () => {
                 type="button" 
                 onClick={startScanner}
                 disabled={data.length === 0 || isPaused}
-                className="absolute right-0 md:static md:ml-4 lg:ml-8 bg-slate-800 hover:bg-slate-700 text-white p-2.5 md:p-6 lg:p-10 rounded-full md:rounded-3xl lg:rounded-[2.5rem] transition-all border border-slate-700 shadow-lg disabled:opacity-30 disabled:cursor-not-allowed"
+                className={`absolute right-0 md:static md:ml-4 lg:ml-8 p-2.5 md:p-6 lg:p-10 rounded-full md:rounded-3xl lg:rounded-[2.5rem] transition-all border shadow-lg disabled:opacity-30 disabled:cursor-not-allowed ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'}`}
                 title="開啟相機掃描"
             >
                 <Camera size={20} className="md:w-10 md:h-10 lg:w-[64px] lg:h-[64px]" />
@@ -773,24 +773,24 @@ const App: React.FC = () => {
           {lastScanned ? (
             <div className="h-full flex flex-col">
               <div className={`flex-1 border-b-2 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-4 lg:py-0 ${isDarkMode ? 'border-slate-800/50 bg-slate-800/10' : 'border-slate-200 bg-slate-50'}`}>
-                <div className={`flex items-center gap-2 md:gap-3 lg:gap-4 mb-1 md:mb-2 font-black text-base md:text-lg lg:text-xl uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}><Package size={18} className="md:w-6 md:h-6 lg:w-[28px] lg:h-[28px]" /> 商品名稱</div>
+                <div className={`flex items-center gap-2 md:gap-3 lg:gap-4 mb-1 md:mb-2 font-black text-base md:text-lg lg:text-xl uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-700'}`}><Package size={18} className="md:w-6 md:h-6 lg:w-[28px] lg:h-[28px]" /> 商品名稱</div>
                 <h2 className={`text-xl md:text-2xl lg:text-4xl font-black truncate drop-shadow-xl leading-tight whitespace-normal md:whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{lastScanned.name}</h2>
                 <div className="flex gap-2 md:gap-4 mt-1 md:mt-2">
                   {lastScanned.color && <span className={`px-2 py-0.5 md:px-3 md:py-1 rounded-lg text-sm md:text-base lg:text-lg font-bold ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'}`}>顏色: {lastScanned.color}</span>}
                   {lastScanned.size && <span className={`px-2 py-0.5 md:px-3 md:py-1 rounded-lg text-sm md:text-base lg:text-lg font-bold ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'}`}>尺寸: {lastScanned.size}</span>}
-                  {lastScanned.price && <span className={`px-2 py-0.5 md:px-3 md:py-1 rounded-lg text-sm md:text-base lg:text-lg font-bold ${isDarkMode ? 'bg-slate-800 text-amber-500' : 'bg-amber-100 text-amber-700'}`}>定價: ${lastScanned.price}</span>}
+                  {lastScanned.price && <span className={`px-2 py-0.5 md:px-3 md:py-1 rounded-lg text-sm md:text-base lg:text-lg font-bold ${isDarkMode ? 'bg-slate-800 text-amber-500' : 'bg-amber-100 text-amber-800'}`}>定價: ${lastScanned.price}</span>}
                 </div>
               </div>
               <div className={`flex-1 border-b-2 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-4 lg:py-0 ${isDarkMode ? 'border-slate-800/50' : 'border-slate-200'}`}>
-                <div className={`flex items-center gap-2 md:gap-3 lg:gap-4 mb-1 md:mb-2 font-black text-lg md:text-2xl lg:text-3xl uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}><Info size={18} className="md:w-6 md:h-6 lg:w-[28px] lg:h-[28px]" /> 款式代號 / 條碼</div>
+                <div className={`flex items-center gap-2 md:gap-3 lg:gap-4 mb-1 md:mb-2 font-black text-lg md:text-2xl lg:text-3xl uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-700'}`}><Info size={18} className="md:w-6 md:h-6 lg:w-[28px] lg:h-[28px]" /> 款式代號 / 條碼</div>
                 <p className="text-2xl md:text-4xl lg:text-6xl font-black text-blue-400 font-mono tracking-tighter leading-none break-all">{lastScanned.productCode}</p>
-                <p className={`text-lg md:text-2xl lg:text-4xl font-bold font-mono mt-2 md:mt-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-600'}`}>{lastScanned.barcode}</p>
+                <p className={`text-lg md:text-2xl lg:text-4xl font-bold font-mono mt-2 md:mt-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-800'}`}>{lastScanned.barcode}</p>
               </div>
             </div>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center opacity-10 py-10 md:py-0">
-              <ScanBarcode size={80} className="md:w-32 md:h-32 lg:w-[180px] lg:h-[180px]" />
-              <p className="text-xl md:text-3xl lg:text-5xl font-black mt-4 md:mt-8 tracking-[0.5em] uppercase text-center">掃描就緒</p>
+            <div className={`h-full flex flex-col items-center justify-center py-10 md:py-0 ${isDarkMode ? 'opacity-10' : 'opacity-30'}`}>
+              <ScanBarcode size={80} className={`md:w-32 md:h-32 lg:w-[180px] lg:h-[180px] ${isDarkMode ? 'text-white' : 'text-slate-900'}`} />
+              <p className={`text-xl md:text-3xl lg:text-5xl font-black mt-4 md:mt-8 tracking-[0.5em] uppercase text-center ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>掃描就緒</p>
             </div>
           )}
         </div>
@@ -804,9 +804,9 @@ const App: React.FC = () => {
               <button onClick={manualSetTotalQty} className={`absolute bottom-2 right-2 md:bottom-6 md:right-6 lg:bottom-10 lg:right-10 px-2 py-1 md:px-4 md:py-2 lg:px-6 lg:py-4 rounded-lg md:rounded-2xl lg:rounded-3xl transition-all flex items-center gap-1 md:gap-2 lg:gap-3 text-xs md:text-xl lg:text-2xl font-black backdrop-blur-md shadow-2xl border-2 ${isDarkMode ? 'bg-white/20 hover:bg-white text-white hover:text-blue-600 border-white/20' : 'bg-blue-700/20 hover:bg-blue-700 text-blue-700 hover:text-white border-blue-700/20'}`}><Edit3 size={14} className="md:w-6 md:h-6 lg:w-[32px] lg:h-[32px]" /> 修正</button>
             )}
           </div>
-          <div className={`flex-1 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col items-center justify-center shadow-2xl transition-all duration-500 p-3 md:p-4 ${!lastScanned ? (isDarkMode ? 'bg-slate-800 text-slate-700' : 'bg-slate-200 text-slate-400') : lastScanned.diff === 0 ? 'bg-emerald-600' : 'bg-red-600'}`}>
-            <span className="font-black text-sm md:text-xl lg:text-2xl mb-1 md:mb-2 lg:mb-4 uppercase tracking-[0.2em] md:tracking-[0.4em] opacity-80 text-white">庫存差異</span>
-            <div className="text-3xl md:text-5xl lg:text-7xl font-black text-white leading-none">{lastScanned ? (lastScanned.diff > 0 ? `+${lastScanned.diff}` : lastScanned.diff) : '0'}</div>
+          <div className={`flex-1 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col items-center justify-center shadow-2xl transition-all duration-500 p-3 md:p-4 ${!lastScanned ? (isDarkMode ? 'bg-slate-800 text-slate-700' : 'bg-slate-100 text-slate-600') : lastScanned.diff === 0 ? 'bg-emerald-600' : 'bg-red-600'}`}>
+            <span className={`font-black text-sm md:text-xl lg:text-2xl mb-1 md:mb-2 lg:mb-4 uppercase tracking-[0.2em] md:tracking-[0.4em] ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white opacity-80'}`}>庫存差異</span>
+            <div className={`text-3xl md:text-5xl lg:text-7xl font-black leading-none ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white'}`}>{lastScanned ? (lastScanned.diff > 0 ? `+${lastScanned.diff}` : lastScanned.diff) : '0'}</div>
           </div>
         </div>
       </main>
@@ -814,9 +814,9 @@ const App: React.FC = () => {
       {/* 底部數據：手機版改為 Grid 2欄，電腦版 3欄 */}
       <footer className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-8 lg:gap-12 shrink-0 h-auto md:h-56 lg:h-80 mb-20 md:mb-4">
         <div className={`col-span-1 border-2 md:border-4 lg:border-[8px] rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex items-center px-4 md:px-10 lg:px-20 gap-3 md:gap-10 lg:gap-20 shadow-2xl py-4 md:py-0 transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
-          <Package className={`w-8 h-8 md:w-20 md:h-20 lg:w-36 lg:h-36 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} />
+          <Package className={`w-8 h-8 md:w-20 md:h-20 lg:w-36 lg:h-36 ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`} />
           <div>
-            <p className={`text-xs md:text-2xl lg:text-4xl font-black uppercase mb-1 md:mb-3 lg:mb-6 tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}>總項數</p>
+            <p className={`text-xs md:text-2xl lg:text-4xl font-black uppercase mb-1 md:mb-3 lg:mb-6 tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-600'}`}>總項數</p>
             <p className={`text-2xl md:text-7xl lg:text-[10rem] font-black leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{data.length}</p>
           </div>
         </div>
