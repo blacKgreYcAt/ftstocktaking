@@ -1,0 +1,5 @@
+{
+  "name": "大豐資訊盤點系統",
+  "description": "大豐資訊專屬高效能網頁盤點工具，支援 USB 條碼掃描器，純前端運行，安全且快速。",
+  "requestFramePermissions": []
+}
