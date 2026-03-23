@@ -130,7 +130,10 @@ const App: React.FC = () => {
 
   // Focus Logic
   const focusInput = useCallback(() => {
-    if (document.activeElement === qtyRef.current || document.activeElement === locationRef.current) return;
+    // 如果當前焦點已經在任何輸入框內，就不執行自動抓回焦點
+    const active = document.activeElement;
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+
     if (inputRef.current && !showUnscannedList && !showMappingModal && !isPaused && !showScanner) {
       inputRef.current.focus();
     }
