@@ -945,26 +945,26 @@ const App: React.FC = () => {
       {/* 軟體更新 Modal */}
       {showUpdateModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[300] flex items-center justify-center p-4">
-          <div className={`w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border-2 ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
-            <div className="p-6 md:p-10 bg-blue-600 text-white flex justify-between items-center">
+          <div className={`w-full max-w-4xl rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl border-4 ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+            <div className="p-8 md:p-14 bg-blue-600 text-white flex justify-between items-center">
               <div>
-                <h3 className="text-2xl md:text-4xl font-black italic">軟體更新說明</h3>
-                <p className="opacity-80 font-bold mt-1">目前版本：{APP_VERSION}</p>
+                <h3 className="text-3xl md:text-6xl font-black italic">軟體更新說明</h3>
+                <p className="text-xl md:text-3xl opacity-80 font-bold mt-2">目前版本：{APP_VERSION}</p>
               </div>
-              <button onClick={() => setShowUpdateModal(false)} className="p-2 hover:bg-white/20 rounded-full transition-colors"><X size={32} /></button>
+              <button onClick={() => setShowUpdateModal(false)} className="p-3 hover:bg-white/20 rounded-full transition-colors"><X size={48} className="md:w-16 md:h-16" /></button>
             </div>
-            <div className="p-8 md:p-12 space-y-6">
-              <div className="space-y-4">
+            <div className="p-10 md:p-20 space-y-8">
+              <div className="space-y-6">
                 {UPDATE_NOTES.map((note, idx) => (
-                  <div key={idx} className="flex gap-4 items-start">
-                    <div className="w-2 h-2 rounded-full bg-blue-500 mt-2.5 shrink-0" />
-                    <p className="text-lg md:text-2xl font-bold leading-relaxed">{note}</p>
+                  <div key={idx} className="flex gap-6 items-start">
+                    <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-blue-500 mt-3 md:mt-4 shrink-0" />
+                    <p className="text-xl md:text-4xl font-bold leading-relaxed">{note}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className={`p-6 md:p-10 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-              <button onClick={() => setShowUpdateModal(false)} className="w-full py-4 md:py-6 bg-slate-800 text-white rounded-2xl text-xl md:text-2xl font-black hover:bg-slate-700 transition-all">確定</button>
+            <div className={`p-8 md:p-14 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+              <button onClick={() => setShowUpdateModal(false)} className="w-full py-6 md:py-10 bg-slate-800 text-white rounded-3xl text-2xl md:text-4xl font-black hover:bg-slate-700 transition-all shadow-xl">確定</button>
             </div>
           </div>
         </div>
@@ -973,25 +973,25 @@ const App: React.FC = () => {
       {/* 使用教學 Modal */}
       {showGuideModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[300] flex items-center justify-center p-4">
-          <div className={`w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl border-2 max-h-[90vh] flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
-            <div className="p-6 md:p-10 bg-emerald-600 text-white flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-4">
-                <BookOpen size={32} className="md:w-12 md:h-12" />
-                <h3 className="text-2xl md:text-4xl font-black italic">使用教學指南</h3>
+          <div className={`w-full max-w-6xl rounded-[2rem] md:rounded-[4rem] overflow-hidden shadow-2xl border-4 max-h-[92vh] flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+            <div className="p-8 md:p-14 bg-emerald-600 text-white flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-6">
+                <BookOpen size={48} className="md:w-20 md:h-20" />
+                <h3 className="text-3xl md:text-6xl font-black italic">使用教學指南</h3>
               </div>
-              <button onClick={() => setShowGuideModal(false)} className="p-2 hover:bg-white/20 rounded-full transition-colors"><X size={32} /></button>
+              <button onClick={() => setShowGuideModal(false)} className="p-3 hover:bg-white/20 rounded-full transition-colors"><X size={48} className="md:w-16 md:h-16" /></button>
             </div>
-            <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-10 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-10 md:p-20 space-y-12 md:space-y-20 custom-scrollbar">
               {GUIDE_STEPS.map((step, idx) => (
-                <div key={idx} className={`relative p-6 md:p-10 rounded-3xl border-2 transition-all ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                  <div className="absolute -top-6 -left-4 bg-emerald-600 text-white w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-xl md:text-3xl font-black shadow-xl">{idx + 1}</div>
-                  <h4 className="text-xl md:text-3xl font-black mb-4 md:mb-6 pl-6 md:pl-10 text-emerald-500">{step.title}</h4>
-                  <p className={`text-lg md:text-2xl font-bold leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>{step.content}</p>
+                <div key={idx} className={`relative p-8 md:p-16 rounded-[2rem] md:rounded-[3rem] border-4 transition-all ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className="absolute -top-8 -left-6 bg-emerald-600 text-white w-16 h-16 md:w-24 md:h-24 rounded-3xl flex items-center justify-center text-2xl md:text-5xl font-black shadow-2xl">{idx + 1}</div>
+                  <h4 className="text-2xl md:text-5xl font-black mb-6 md:mb-10 pl-10 md:pl-16 text-emerald-500">{step.title}</h4>
+                  <p className={`text-xl md:text-4xl font-bold leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>{step.content}</p>
                 </div>
               ))}
             </div>
-            <div className={`p-6 md:p-10 border-t shrink-0 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
-              <button onClick={() => setShowGuideModal(false)} className="w-full py-4 md:py-6 bg-emerald-600 text-white rounded-2xl text-xl md:text-2xl font-black hover:bg-emerald-700 transition-all">我了解了，開始作業</button>
+            <div className={`p-8 md:p-14 border-t shrink-0 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+              <button onClick={() => setShowGuideModal(false)} className="w-full py-6 md:py-10 bg-emerald-600 text-white rounded-3xl text-2xl md:text-4xl font-black hover:bg-emerald-700 transition-all shadow-xl">我了解了，開始作業</button>
             </div>
           </div>
         </div>
