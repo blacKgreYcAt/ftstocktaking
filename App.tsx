@@ -38,18 +38,19 @@ const App: React.FC = () => {
   const [isCreatingNew, setIsCreatingNew] = useState(false);
 
   const [operatorName, setOperatorName] = useState('');
+  const [warehouseCode, setWarehouseCode] = useState('T0300');
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('');
   const [timeFormat, setTimeFormat] = useState<TimeFormat>('date');
 
   // Refs to avoid stale closures in scanner callbacks
   const dataRef = useRef(data);
-  const configRef = useRef({ scanQty, locationEnabled, currentLocation, timeFormat, operatorName, isPaused });
+  const configRef = useRef({ scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused });
 
   useEffect(() => { dataRef.current = data; }, [data]);
   useEffect(() => {
-    configRef.current = { scanQty, locationEnabled, currentLocation, timeFormat, operatorName, isPaused };
-  }, [scanQty, locationEnabled, currentLocation, timeFormat, operatorName, isPaused]);
+    configRef.current = { scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused };
+  }, [scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused]);
   
   // Camera Scanner State
   const [showScanner, setShowScanner] = useState(false);
@@ -113,6 +114,7 @@ const App: React.FC = () => {
           setCurrentLocation(parsed.config.currentLocation || '');
           setTimeFormat(parsed.config.timeFormat === 'off' ? 'date' : (parsed.config.timeFormat || 'date'));
           setOperatorName(parsed.config.operatorName || '');
+          setWarehouseCode(parsed.config.warehouseCode || 'T0300');
           setIsPaused(!!parsed.config.isPaused);
         }
       } catch (e) { console.error(e); }
@@ -120,11 +122,11 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (data.length > 0 || operatorName || locationEnabled || timeFormat !== 'off' || isPaused) {
-      const config = { locationEnabled, currentLocation, timeFormat, operatorName, isPaused };
+    if (data.length > 0 || operatorName || warehouseCode !== 'T0300' || locationEnabled || timeFormat !== 'off' || isPaused) {
+      const config = { locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused };
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: data, config }));
     }
-  }, [data, locationEnabled, currentLocation, timeFormat, operatorName, isPaused]);
+  }, [data, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused]);
 
   // Focus Logic
   const focusInput = useCallback(() => {
@@ -360,6 +362,49 @@ const App: React.FC = () => {
     addLog('info', '匯出 Excel 報表', { itemCount: data.length });
   };
 
+  const handleExportMachineFormat = () => {
+    if (data.length === 0) return;
+    
+    const now = new Date();
+    const yyyymmdd = now.getFullYear().toString() + 
+                     (now.getMonth() + 1).toString().padStart(2, '0') + 
+                     now.getDate().toString().padStart(2, '0');
+    
+    const workId = `${yyyymmdd}FT015`;
+    const suffix = "0 00000021";
+    
+    // Helper to pad strings to fixed width
+    const pad = (str: string, length: number) => {
+      return (str || '').toString().padEnd(length, ' ');
+    };
+
+    const lines = data
+      .filter(item => item.actualQty > 0)
+      .map(item => {
+        const col1 = pad(warehouseCode, 15);
+        const col2 = pad(workId, 20);
+        const col3 = pad(item.location || ' ', 12);
+        const col4 = pad(item.barcode || item.productCode, 32);
+        const col5 = pad(item.actualQty.toString(), 56);
+        const col6 = suffix;
+        
+        return `${col1}${col2}${col3}${col4}${col5}${col6}`;
+      });
+
+    const content = lines.join('\n');
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `大豐盤點機格式_${yyyymmdd}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    addLog('info', '匯出盤點機格式 TXT 報表', { itemCount: lines.length });
+  };
+
   const handleExportLogs = () => {
     const logData = {
       app: "大豐資訊盤點系統",
@@ -545,10 +590,18 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-1 md:gap-4">
-              <span className="text-sm md:text-2xl font-black text-slate-400 uppercase tracking-widest pl-1">STEP 2. 人員</span>
+              <span className="text-sm md:text-2xl font-black text-slate-400 uppercase tracking-widest pl-1">STEP 2. 人員/倉庫</span>
               <div className="h-16 md:h-24 flex items-center bg-slate-900 border-2 md:border-4 border-slate-800 rounded-2xl md:rounded-[2rem] focus-within:border-blue-500 transition-all px-4 md:px-8 gap-2 md:gap-5">
-                <User size={24} className="md:w-[40px] md:h-[40px] text-slate-500" />
-                <input type="text" value={operatorName} onChange={(e) => setOperatorName(e.target.value)} placeholder="姓名" className="bg-transparent text-xl md:text-3xl font-black outline-none placeholder:text-slate-700 w-24 md:w-56" />
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <User size={16} className="text-slate-500" />
+                    <input type="text" value={operatorName} onChange={(e) => setOperatorName(e.target.value)} placeholder="姓名" className="bg-transparent text-lg md:text-xl font-black outline-none placeholder:text-slate-700 w-20 md:w-32" />
+                  </div>
+                  <div className="flex items-center gap-2 border-t border-slate-800 mt-1 pt-1">
+                    <Package size={16} className="text-slate-500" />
+                    <input type="text" value={warehouseCode} onChange={(e) => setWarehouseCode(e.target.value)} placeholder="倉庫" className="bg-transparent text-lg md:text-xl font-black outline-none placeholder:text-slate-700 w-20 md:w-32" />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -587,7 +640,14 @@ const App: React.FC = () => {
 
             <div className="flex flex-col gap-1 md:gap-4">
               <span className="text-sm md:text-2xl font-black text-red-500 uppercase tracking-widest pl-1">STEP 5. 結束</span>
-              <button onClick={handleEndJob} disabled={data.length === 0} className={`h-16 md:h-24 flex items-center gap-2 md:gap-5 px-6 md:px-10 rounded-2xl md:rounded-[2rem] text-xl md:text-3xl font-black transition-all shadow-md border-2 md:border-4 ${data.length > 0 ? 'bg-red-600 border-red-400 hover:bg-red-700 text-white' : 'bg-slate-900 border-slate-800 text-slate-700 cursor-not-allowed'}`}><LogOut size={24} className="md:w-[40px] md:h-[40px]" /> 結束</button>
+              <div className="flex gap-2">
+                <button onClick={handleEndJob} disabled={data.length === 0} className={`h-16 md:h-24 flex items-center gap-2 md:gap-5 px-4 md:px-8 rounded-2xl md:rounded-[2rem] text-lg md:text-2xl font-black transition-all shadow-md border-2 md:border-4 ${data.length > 0 ? 'bg-red-600 border-red-400 hover:bg-red-700 text-white' : 'bg-slate-900 border-slate-800 text-slate-700 cursor-not-allowed'}`} title="匯出 Excel 並結束">
+                  <LogOut size={24} className="md:w-[32px] md:h-[32px]" /> 結束
+                </button>
+                <button onClick={handleExportMachineFormat} disabled={data.length === 0} className={`h-16 md:h-24 flex items-center gap-2 md:gap-5 px-4 md:px-8 rounded-2xl md:rounded-[2rem] text-lg md:text-2xl font-black transition-all shadow-md border-2 md:border-4 ${data.length > 0 ? 'bg-indigo-600 border-indigo-400 hover:bg-indigo-700 text-white' : 'bg-slate-900 border-slate-800 text-slate-700 cursor-not-allowed'}`} title="匯出盤點機 TXT 格式">
+                  <FileDown size={24} className="md:w-[32px] md:h-[32px]" /> TXT
+                </button>
+              </div>
             </div>
           </div>
         </div>
