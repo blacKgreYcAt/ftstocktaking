@@ -478,28 +478,28 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <header className="flex flex-col md:flex-row md:flex-wrap justify-between items-start md:items-center mb-2 md:mb-3 lg:mb-4 shrink-0 gap-2 md:gap-3">
+      <header className="flex flex-col md:flex-row md:flex-wrap justify-between items-start md:items-center mb-2 md:mb-4 lg:mb-6 xl:mb-6 shrink-0 gap-2 md:gap-4 lg:gap-4">
         <div className="w-full md:w-auto pb-1 md:pb-0 shrink-0">
-          <div className="flex flex-wrap gap-1 md:gap-1.5 lg:gap-2 items-stretch">
+          <div className="flex flex-wrap gap-1.5 md:gap-2 lg:gap-3 xl:gap-4 items-stretch">
             
-            <div className="flex flex-col gap-0.5">
-              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>主題</span>
-              <div className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 p-1 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+            <div className="flex flex-col gap-1">
+              <span className={`text-[10px] md:text-xs lg:text-sm xl:text-base font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>主題</span>
+              <div className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center gap-1.5 p-1.5 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className={`flex p-0.5 rounded-md border h-full ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
-                  <button onClick={() => setIsDarkMode(true)} className={`px-1.5 md:px-3 lg:px-4 rounded-sm md:rounded-lg text-[10px] md:text-xs lg:text-sm font-black transition-all flex items-center gap-1 ${isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
-                    <Moon size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 黑色
+                  <button onClick={() => setIsDarkMode(true)} className={`px-2 md:px-4 lg:px-6 xl:px-8 rounded-sm md:rounded-lg text-[10px] md:text-sm lg:text-base xl:text-lg font-black transition-all flex items-center gap-1.5 ${isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                    <Moon size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" /> 黑色
                   </button>
-                  <button onClick={() => setIsDarkMode(false)} className={`px-1.5 md:px-3 lg:px-4 rounded-sm md:rounded-lg text-[10px] md:text-xs lg:text-sm font-black transition-all flex items-center gap-1 ${!isDarkMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
-                    <Sun size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 白色
+                  <button onClick={() => setIsDarkMode(false)} className={`px-2 md:px-4 lg:px-6 xl:px-8 rounded-sm md:rounded-lg text-[10px] md:text-sm lg:text-base xl:text-lg font-black transition-all flex items-center gap-1.5 ${!isDarkMode ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                    <Sun size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" /> 白色
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-0.5">
-              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-blue-500' : 'text-blue-800'}`}>S1. 匯入</span>
-              <label className={`h-11 md:h-16 lg:h-20 flex items-center gap-1.5 px-2 md:px-4 lg:px-6 rounded-lg cursor-pointer text-xs md:text-xl lg:text-2xl font-black transition-all shadow-sm border ${data.length === 0 ? 'bg-blue-600 border-blue-400 hover:bg-blue-700 animate-pulse text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:border-blue-500' : 'bg-white border-slate-300 text-slate-700 hover:border-blue-600 shadow-sm')}`}>
-                 <FileSpreadsheet size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6" /> 
+            <div className="flex flex-col gap-1">
+              <span className={`text-[10px] md:text-xs lg:text-sm xl:text-base font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-blue-500' : 'text-blue-800'}`}>S1. 匯入</span>
+              <label className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center gap-2 px-3 md:px-6 lg:px-8 xl:px-10 rounded-lg cursor-pointer text-xs md:text-xl lg:text-2xl xl:text-3xl font-black transition-all shadow-sm border ${data.length === 0 ? 'bg-blue-600 border-blue-400 hover:bg-blue-700 animate-pulse text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-400 hover:border-blue-500' : 'bg-white border-slate-300 text-slate-700 hover:border-blue-600 shadow-sm')}`}>
+                 <FileSpreadsheet size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" /> 
                  {data.length === 0 ? "匯入" : "重讀"}
                  <input type="file" accept=".csv, .xlsx" onChange={(e) => {
                    const file = e.target.files?.[0]; if (!file) return;
@@ -525,77 +525,77 @@ const App: React.FC = () => {
               </label>
             </div>
 
-            <div className="flex flex-col gap-0.5">
-              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>S2. 人員/倉庫</span>
-              <div className={`h-11 md:h-16 lg:h-20 flex items-center border rounded-lg focus-within:border-blue-500 transition-all px-2 md:px-4 lg:px-6 gap-2 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+            <div className="flex flex-col gap-1">
+              <span className={`text-[10px] md:text-xs lg:text-sm xl:text-base font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>S2. 人員/倉庫</span>
+              <div className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center border rounded-lg focus-within:border-blue-500 transition-all px-3 md:px-6 lg:px-8 xl:px-10 gap-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className="flex flex-col">
-                  <div className="flex items-center gap-1.5">
-                    <User size={12} className="text-slate-600 md:w-4 md:h-4 lg:w-5 lg:h-5" />
-                    <input type="text" value={operatorName} onChange={(e) => setOperatorName(e.target.value)} placeholder="姓名" className={`bg-transparent text-xs md:text-xl lg:text-2xl font-black outline-none w-12 md:w-24 lg:w-32 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
+                  <div className="flex items-center gap-2">
+                    <User size={14} className="text-slate-600 md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-8 xl:h-8" />
+                    <input type="text" value={operatorName} onChange={(e) => setOperatorName(e.target.value)} placeholder="姓名" className={`bg-transparent text-xs md:text-2xl lg:text-3xl xl:text-4xl font-black outline-none w-16 md:w-32 lg:w-48 xl:w-64 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
                   </div>
-                  <div className={`flex items-center gap-1.5 border-t mt-1 pt-1 ${isDarkMode ? 'border-slate-800' : 'border-slate-300'}`}>
-                    <Package size={12} className="text-slate-600 md:w-4 md:h-4 lg:w-5 lg:h-5" />
-                    <input type="text" value={warehouseCode} onChange={(e) => setWarehouseCode(e.target.value)} placeholder="倉庫" className={`bg-transparent text-xs md:text-xl lg:text-2xl font-black outline-none w-12 md:w-24 lg:w-32 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
+                  <div className={`flex items-center gap-2 border-t mt-1.5 pt-1.5 ${isDarkMode ? 'border-slate-800' : 'border-slate-300'}`}>
+                    <Package size={14} className="text-slate-600 md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-8 xl:h-8" />
+                    <input type="text" value={warehouseCode} onChange={(e) => setWarehouseCode(e.target.value)} placeholder="倉庫" className={`bg-transparent text-xs md:text-2xl lg:text-3xl xl:text-4xl font-black outline-none w-16 md:w-32 lg:w-48 xl:w-64 ${isDarkMode ? 'text-white placeholder:text-slate-700' : 'text-slate-900 placeholder:text-slate-500'}`} />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col gap-0.5">
-              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>S3. 設定</span>
-              <div className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 p-1 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+            <div className="flex flex-col gap-1">
+              <span className={`text-[10px] md:text-xs lg:text-sm xl:text-base font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>S3. 設定</span>
+              <div className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center gap-1.5 p-1.5 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <div className={`flex p-0.5 rounded-md border h-full ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-300'}`}>
-                  <button onClick={() => setTimeFormat('date')} className={`px-1.5 md:px-3 lg:px-4 rounded-sm md:rounded-lg text-[10px] md:text-xs lg:text-sm font-black transition-all ${timeFormat === 'date' ? (isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'bg-slate-300 text-slate-900 shadow-sm') : 'text-slate-600 hover:text-slate-900'}`}>日期</button>
-                  <button onClick={() => setTimeFormat('datetime')} className={`px-1.5 md:px-3 lg:px-4 rounded-sm md:rounded-lg text-[10px] md:text-xs lg:text-sm font-black transition-all flex items-center gap-1 ${timeFormat === 'datetime' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Clock size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" />時間</button>
+                  <button onClick={() => setTimeFormat('date')} className={`px-2 md:px-4 lg:px-6 xl:px-8 rounded-sm md:rounded-lg text-[10px] md:text-sm lg:text-base xl:text-lg font-black transition-all ${timeFormat === 'date' ? (isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'bg-slate-300 text-slate-900 shadow-sm') : 'text-slate-600 hover:text-slate-900'}`}>日期</button>
+                  <button onClick={() => setTimeFormat('datetime')} className={`px-2 md:px-4 lg:px-6 xl:px-8 rounded-sm md:rounded-lg text-[10px] md:text-sm lg:text-base xl:text-lg font-black transition-all flex items-center gap-1.5 ${timeFormat === 'datetime' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Clock size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" />時間</button>
                 </div>
-                <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-xs lg:text-sm border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={12} className="md:w-5 md:h-5 lg:w-6 lg:h-6" />儲位</button>
+                <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />儲位</button>
               </div>
             </div>
 
-            <div className="flex flex-col gap-0.5">
-              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>除錯</span>
-              <div className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 p-1 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+            <div className="flex flex-col gap-1">
+              <span className={`text-[10px] md:text-xs lg:text-sm xl:text-base font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>除錯</span>
+              <div className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center gap-1.5 p-1.5 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
                 <button onClick={handleExportLogs} title="匯出紀錄" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
-                  <Bug size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6" />
+                  <Bug size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
                 </button>
                 <button onClick={handleClearLogs} title="清除紀錄" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-400' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-red-500'}`}>
-                  <RefreshCw size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6" />
+                  <RefreshCw size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
                 </button>
                 <button onClick={handleClearAllData} title="重設所有資料" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-600' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-red-600'}`}>
-                  <X size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6" />
+                  <X size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
                 </button>
               </div>
             </div>
 
-            <div className="flex flex-col gap-0.5">
-              <span className={`text-[10px] md:text-xs lg:text-sm font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>資訊</span>
-              <div className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 p-1 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
-                <button onClick={() => setShowUpdateModal(true)} className={`h-full flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-xs lg:text-sm border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
-                  <Info size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 更新
+            <div className="flex flex-col gap-1">
+              <span className={`text-[10px] md:text-xs lg:text-sm xl:text-base font-black uppercase tracking-tight pl-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-700'}`}>資訊</span>
+              <div className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center gap-1.5 p-1.5 rounded-lg border ${isDarkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+                <button onClick={() => setShowUpdateModal(true)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
+                  <Info size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" /> 更新
                 </button>
-                <button onClick={() => setShowGuideModal(true)} className={`h-full flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-xs lg:text-sm border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
-                  <BookOpen size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 教學
+                <button onClick={() => setShowGuideModal(true)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
+                  <BookOpen size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" /> 教學
                 </button>
               </div>
             </div>
 
-            <div className={`w-px mx-1 self-center h-8 md:h-12 lg:h-14 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-300'}`} />
+            <div className={`w-px mx-1.5 self-center h-10 md:h-16 lg:h-20 xl:h-24 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-300'}`} />
 
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] md:text-xs lg:text-sm font-black text-amber-500 uppercase tracking-tight pl-1">S4. 暫停</span>
-              <button onClick={togglePause} disabled={data.length === 0} className={`h-11 md:h-16 lg:h-20 flex items-center justify-center px-2 md:px-5 lg:px-8 rounded-lg text-sm md:text-2xl lg:text-3xl font-black transition-all shadow-sm border ${isPaused ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-amber-500 hover:bg-slate-800' : 'bg-white border-slate-300 text-amber-600 hover:bg-slate-100')} disabled:opacity-30`}>
-                {isPaused ? <Play size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8" /> : <Pause size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8" />}
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] md:text-xs lg:text-sm xl:text-base font-black text-amber-500 uppercase tracking-tight pl-1">S4. 暫停</span>
+              <button onClick={togglePause} disabled={data.length === 0} className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center justify-center px-3 md:px-8 lg:px-12 xl:px-16 rounded-lg text-sm md:text-2xl lg:text-3xl xl:text-4xl font-black transition-all shadow-sm border ${isPaused ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-amber-500 hover:bg-slate-800' : 'bg-white border-slate-300 text-amber-600 hover:bg-slate-100')} disabled:opacity-30`}>
+                {isPaused ? <Play size={16} className="md:w-8 md:h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12" /> : <Pause size={16} className="md:w-8 md:h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12" />}
               </button>
             </div>
 
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[10px] md:text-xs lg:text-sm font-black text-red-500 uppercase tracking-tight pl-1">S5. 結束</span>
-              <div className="flex gap-1 md:gap-1.5">
-                <button onClick={handleEndJob} disabled={data.length === 0} className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-lg text-xs md:text-xl lg:text-2xl font-black transition-all shadow-sm border ${data.length > 0 ? 'bg-red-600 border-red-400 hover:bg-red-700 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-700' : 'bg-white border-slate-300 text-slate-400 cursor-not-allowed')}`} title="匯出 Excel 並結束">
-                  <LogOut size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> 結束
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] md:text-xs lg:text-sm xl:text-base font-black text-red-500 uppercase tracking-tight pl-1">S5. 結束</span>
+              <div className="flex gap-1.5 md:gap-2 lg:gap-3">
+                <button onClick={handleEndJob} disabled={data.length === 0} className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-lg text-xs md:text-xl lg:text-2xl xl:text-3xl font-black transition-all shadow-sm border ${data.length > 0 ? 'bg-red-600 border-red-400 hover:bg-red-700 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-700' : 'bg-white border-slate-300 text-slate-400 cursor-not-allowed')}`} title="匯出 Excel 並結束">
+                  <LogOut size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" /> 結束
                 </button>
-                <button onClick={handleExportMachineFormat} disabled={data.length === 0} className={`h-11 md:h-16 lg:h-20 flex items-center gap-1 px-2 md:px-4 lg:px-6 rounded-lg text-xs md:text-xl lg:text-2xl font-black transition-all shadow-sm border ${data.length > 0 ? 'bg-indigo-600 border-indigo-400 hover:bg-indigo-700 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-700' : 'bg-white border-slate-300 text-slate-400 cursor-not-allowed')}`} title="匯出盤點機 TXT 格式">
-                  <FileDown size={12} className="md:w-4 md:h-4 lg:w-5 lg:h-5" /> TXT
+                <button onClick={handleExportMachineFormat} disabled={data.length === 0} className={`h-12 md:h-16 lg:h-20 xl:h-24 flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-lg text-xs md:text-xl lg:text-2xl xl:text-3xl font-black transition-all shadow-sm border ${data.length > 0 ? 'bg-indigo-600 border-indigo-400 hover:bg-indigo-700 text-white' : (isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-700' : 'bg-white border-slate-300 text-slate-400 cursor-not-allowed')}`} title="匯出盤點機 TXT 格式">
+                  <FileDown size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" /> TXT
                 </button>
               </div>
             </div>
@@ -603,8 +603,8 @@ const App: React.FC = () => {
         </div>
 
         <div className="hidden md:flex flex-col items-end text-right pb-1 shrink-0 ml-auto">
-            <h1 className={`text-xs md:text-sm lg:text-base font-black tracking-tighter leading-none mb-1 whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>大豐資訊盤點系統</h1>
-            <div className={`font-bold px-2 py-0.5 rounded-full text-[10px] lg:text-xs tracking-widest uppercase border ${isDarkMode ? 'bg-blue-600/20 text-blue-400 border-blue-500/30' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>雲端備份就緒</div>
+            <h1 className={`text-xs md:text-base lg:text-xl xl:text-2xl font-black tracking-tighter leading-none mb-1 md:mb-2 whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>大豐資訊盤點系統</h1>
+            <div className={`font-bold px-3 py-1 rounded-full text-[10px] lg:text-sm xl:text-base tracking-widest uppercase border ${isDarkMode ? 'bg-blue-600/20 text-blue-400 border-blue-500/30' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>雲端備份就緒</div>
         </div>
         {/* 手機版標題簡化 */}
         <div className="md:hidden w-full flex justify-between items-center mt-1 px-1">
@@ -686,71 +686,71 @@ const App: React.FC = () => {
       </div>
 
       {/* 中央主工作區：手機版垂直堆疊 (Grid 1 col)，電腦版左右分割 (Grid 12 cols) */}
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 lg:gap-8 min-h-0 mb-4 md:mb-4 lg:mb-6 shrink-0">
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6 lg:gap-8 xl:gap-8 min-h-0 mb-4 md:mb-4 lg:mb-6 xl:mb-6">
         {/* 上方/左方：產品資訊 */}
-        <div className={`col-span-1 lg:col-span-8 border-2 md:border-3 lg:border-4 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col overflow-hidden relative shadow-2xl min-h-[300px] md:min-h-0 transition-all ${isDarkMode ? 'bg-slate-900/40 border-slate-800/50' : 'bg-white border-slate-200'}`}>
+        <div className={`col-span-1 lg:col-span-8 border-2 md:border-3 lg:border-4 xl:border-[6px] rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col overflow-hidden relative shadow-2xl min-h-[300px] md:min-h-0 transition-all ${isDarkMode ? 'bg-slate-900/40 border-slate-800/50' : 'bg-white border-slate-200'}`}>
           {lastScanned ? (
             <div className="h-full flex flex-col">
-              <div className={`flex-1 border-b-2 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-4 lg:py-0 ${isDarkMode ? 'border-slate-800/50 bg-slate-800/10' : 'border-slate-200 bg-slate-50'}`}>
-                <div className={`flex items-center gap-2 md:gap-3 lg:gap-4 mb-1 md:mb-2 font-black text-base md:text-lg lg:text-xl uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-700'}`}><Package size={18} className="md:w-6 md:h-6 lg:w-[28px] lg:h-[28px]" /> 商品名稱</div>
-                <h2 className={`text-xl md:text-2xl lg:text-4xl font-black truncate drop-shadow-xl leading-tight whitespace-normal md:whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{lastScanned.name}</h2>
-                <div className="flex gap-2 md:gap-4 mt-1 md:mt-2">
-                  {lastScanned.color && <span className={`px-2 py-0.5 md:px-3 md:py-1 rounded-lg text-sm md:text-base lg:text-lg font-bold ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'}`}>顏色: {lastScanned.color}</span>}
-                  {lastScanned.size && <span className={`px-2 py-0.5 md:px-3 md:py-1 rounded-lg text-sm md:text-base lg:text-lg font-bold ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'}`}>尺寸: {lastScanned.size}</span>}
-                  {lastScanned.price && <span className={`px-2 py-0.5 md:px-3 md:py-1 rounded-lg text-sm md:text-base lg:text-lg font-bold ${isDarkMode ? 'bg-slate-800 text-amber-500' : 'bg-amber-100 text-amber-800'}`}>定價: ${lastScanned.price}</span>}
+              <div className={`flex-1 border-b-2 flex flex-col justify-center px-6 md:px-10 lg:px-16 xl:px-20 py-6 md:py-4 lg:py-0 ${isDarkMode ? 'border-slate-800/50 bg-slate-800/10' : 'border-slate-200 bg-slate-50'}`}>
+                <div className={`flex items-center gap-2 md:gap-3 lg:gap-4 xl:gap-6 mb-1 md:mb-2 lg:mb-4 font-black text-base md:text-lg lg:text-xl xl:text-3xl uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-700'}`}><Package size={18} className="md:w-6 md:h-6 lg:w-[28px] lg:h-[28px] xl:w-[48px] xl:h-[48px]" /> 商品名稱</div>
+                <h2 className={`text-xl md:text-2xl lg:text-4xl xl:text-6xl font-black truncate drop-shadow-xl leading-tight whitespace-normal md:whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{lastScanned.name}</h2>
+                <div className="flex gap-2 md:gap-4 lg:gap-6 mt-1 md:mt-2 lg:mt-4">
+                  {lastScanned.color && <span className={`px-2 py-0.5 md:px-3 md:py-1 lg:px-4 lg:py-2 rounded-lg text-sm md:text-base lg:text-lg xl:text-2xl font-bold ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'}`}>顏色: {lastScanned.color}</span>}
+                  {lastScanned.size && <span className={`px-2 py-0.5 md:px-3 md:py-1 lg:px-4 lg:py-2 rounded-lg text-sm md:text-base lg:text-lg xl:text-2xl font-bold ${isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-200 text-slate-700'}`}>尺寸: {lastScanned.size}</span>}
+                  {lastScanned.price && <span className={`px-2 py-0.5 md:px-3 md:py-1 lg:px-4 lg:py-2 rounded-lg text-sm md:text-base lg:text-lg xl:text-2xl font-bold ${isDarkMode ? 'bg-slate-800 text-amber-500' : 'bg-amber-100 text-amber-800'}`}>定價: ${lastScanned.price}</span>}
                 </div>
               </div>
-              <div className={`flex-1 border-b-2 flex flex-col justify-center px-6 md:px-10 lg:px-16 py-6 md:py-4 lg:py-0 ${isDarkMode ? 'border-slate-800/50' : 'border-slate-200'}`}>
-                <div className={`flex items-center gap-2 md:gap-3 lg:gap-4 mb-1 md:mb-2 font-black text-lg md:text-2xl lg:text-3xl uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-700'}`}><Info size={18} className="md:w-6 md:h-6 lg:w-[28px] lg:h-[28px]" /> 款式代號 / 條碼</div>
-                <p className="text-2xl md:text-4xl lg:text-6xl font-black text-blue-400 font-mono tracking-tighter leading-none break-all">{lastScanned.productCode}</p>
-                <p className={`text-lg md:text-2xl lg:text-4xl font-bold font-mono mt-2 md:mt-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-800'}`}>{lastScanned.barcode}</p>
+              <div className={`flex-1 border-b-2 flex flex-col justify-center px-6 md:px-10 lg:px-16 xl:px-20 py-6 md:py-4 lg:py-0 ${isDarkMode ? 'border-slate-800/50' : 'border-slate-200'}`}>
+                <div className={`flex items-center gap-2 md:gap-3 lg:gap-4 xl:gap-6 mb-1 md:mb-2 lg:mb-4 font-black text-lg md:text-2xl lg:text-3xl xl:text-5xl uppercase tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-700'}`}><Info size={18} className="md:w-6 md:h-6 lg:w-[28px] lg:h-[28px] xl:w-[48px] xl:h-[48px]" /> 款式代號 / 條碼</div>
+                <p className="text-2xl md:text-4xl lg:text-6xl xl:text-8xl font-black text-blue-400 font-mono tracking-tighter leading-none break-all">{lastScanned.productCode}</p>
+                <p className={`text-lg md:text-2xl lg:text-4xl xl:text-6xl font-bold font-mono mt-2 md:mt-4 lg:mt-6 ${isDarkMode ? 'text-slate-600' : 'text-slate-800'}`}>{lastScanned.barcode}</p>
               </div>
             </div>
           ) : (
             <div className={`h-full flex flex-col items-center justify-center py-10 md:py-0 ${isDarkMode ? 'opacity-10' : 'opacity-30'}`}>
-              <ScanBarcode size={80} className={`md:w-32 md:h-32 lg:w-[180px] lg:h-[180px] ${isDarkMode ? 'text-white' : 'text-slate-900'}`} />
-              <p className={`text-xl md:text-3xl lg:text-5xl font-black mt-4 md:mt-8 tracking-[0.5em] uppercase text-center ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>掃描就緒</p>
+              <ScanBarcode size={80} className={`md:w-32 md:h-32 lg:w-[180px] lg:h-[180px] xl:w-[240px] xl:h-[240px] ${isDarkMode ? 'text-white' : 'text-slate-900'}`} />
+              <p className={`text-xl md:text-3xl lg:text-5xl xl:text-7xl font-black mt-4 md:mt-8 lg:mt-12 tracking-[0.5em] uppercase text-center ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>掃描就緒</p>
             </div>
           )}
         </div>
 
         {/* 下方/右方：數量統計 */}
-        <div className="col-span-1 lg:col-span-4 flex flex-row lg:flex-col gap-4 md:gap-6 lg:gap-8 h-32 md:h-40 lg:h-auto">
-          <div className="flex-1 bg-blue-600 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col items-center justify-center shadow-2xl relative p-3 md:p-4">
-            <span className="text-blue-100 font-black text-base md:text-2xl lg:text-4xl mb-1 md:mb-2 lg:mb-4 uppercase tracking-[0.2em] md:tracking-[0.4em]">累計數量</span>
-            <div className="text-4xl md:text-7xl lg:text-9xl font-black drop-shadow-2xl text-white leading-none">{lastScanned?.actualQty ?? '0'}</div>
+        <div className="col-span-1 lg:col-span-4 flex flex-row lg:flex-col gap-4 md:gap-6 lg:gap-8 xl:gap-10 h-32 md:h-40 lg:h-auto">
+          <div className="flex-1 bg-blue-600 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col items-center justify-center shadow-2xl relative p-3 md:p-4 lg:p-6">
+            <span className="text-blue-100 font-black text-base md:text-2xl lg:text-4xl xl:text-5xl mb-1 md:mb-2 lg:mb-4 xl:mb-6 uppercase tracking-[0.2em] md:tracking-[0.4em]">累計數量</span>
+            <div className="text-4xl md:text-7xl lg:text-9xl xl:text-[12rem] font-black drop-shadow-2xl text-white leading-none">{lastScanned?.actualQty ?? '0'}</div>
             {lastScanned && (
-              <button onClick={manualSetTotalQty} className={`absolute bottom-2 right-2 md:bottom-6 md:right-6 lg:bottom-10 lg:right-10 px-2 py-1 md:px-4 md:py-2 lg:px-6 lg:py-4 rounded-lg md:rounded-2xl lg:rounded-3xl transition-all flex items-center gap-1 md:gap-2 lg:gap-3 text-xs md:text-xl lg:text-2xl font-black backdrop-blur-md shadow-2xl border-2 ${isDarkMode ? 'bg-white/20 hover:bg-white text-white hover:text-blue-600 border-white/20' : 'bg-blue-700/20 hover:bg-blue-700 text-blue-700 hover:text-white border-blue-700/20'}`}><Edit3 size={14} className="md:w-6 md:h-6 lg:w-[32px] lg:h-[32px]" /> 修正</button>
+              <button onClick={manualSetTotalQty} className={`absolute bottom-2 right-2 md:bottom-6 md:right-6 lg:bottom-10 lg:right-10 xl:bottom-14 xl:right-14 px-2 py-1 md:px-4 md:py-2 lg:px-6 lg:py-4 xl:px-8 xl:py-6 rounded-lg md:rounded-2xl lg:rounded-3xl transition-all flex items-center gap-1 md:gap-2 lg:gap-3 xl:gap-4 text-xs md:text-xl lg:text-2xl xl:text-4xl font-black backdrop-blur-md shadow-2xl border-2 ${isDarkMode ? 'bg-white/20 hover:bg-white text-white hover:text-blue-600 border-white/20' : 'bg-blue-700/20 hover:bg-blue-700 text-blue-700 hover:text-white border-blue-700/20'}`}><Edit3 size={14} className="md:w-6 md:h-6 lg:w-[32px] lg:h-[32px] xl:w-[48px] xl:h-[48px]" /> 修正</button>
             )}
           </div>
-          <div className={`flex-1 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col items-center justify-center shadow-2xl transition-all duration-500 p-3 md:p-4 ${!lastScanned ? (isDarkMode ? 'bg-slate-800 text-slate-700' : 'bg-slate-100 text-slate-600') : lastScanned.diff === 0 ? 'bg-emerald-600' : 'bg-red-600'}`}>
-            <span className={`font-black text-base md:text-2xl lg:text-4xl mb-1 md:mb-2 lg:mb-4 uppercase tracking-[0.2em] md:tracking-[0.4em] ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white opacity-80'}`}>庫存差異</span>
-            <div className={`text-4xl md:text-7xl lg:text-9xl font-black leading-none ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white'}`}>{lastScanned ? (lastScanned.diff > 0 ? `+${lastScanned.diff}` : lastScanned.diff) : '0'}</div>
+          <div className={`flex-1 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-col items-center justify-center shadow-2xl transition-all duration-500 p-3 md:p-4 lg:p-6 ${!lastScanned ? (isDarkMode ? 'bg-slate-800 text-slate-700' : 'bg-slate-100 text-slate-600') : lastScanned.diff === 0 ? 'bg-emerald-600' : 'bg-red-600'}`}>
+            <span className={`font-black text-base md:text-2xl lg:text-4xl xl:text-5xl mb-1 md:mb-2 lg:mb-4 xl:mb-6 uppercase tracking-[0.2em] md:tracking-[0.4em] ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white opacity-80'}`}>庫存差異</span>
+            <div className={`text-4xl md:text-7xl lg:text-9xl xl:text-[12rem] font-black leading-none ${!lastScanned ? (isDarkMode ? 'text-slate-700' : 'text-slate-400') : 'text-white'}`}>{lastScanned ? (lastScanned.diff > 0 ? `+${lastScanned.diff}` : lastScanned.diff) : '0'}</div>
           </div>
         </div>
       </main>
 
       {/* 底部數據：手機版改為 Grid 2欄，電腦版 3欄 */}
-      <footer className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-8 lg:gap-12 shrink-0 h-auto md:h-56 lg:h-80 mb-20 md:mb-4">
-        <div className={`col-span-1 border-2 md:border-4 lg:border-[8px] rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex items-center px-4 md:px-10 lg:px-20 gap-3 md:gap-10 lg:gap-20 shadow-2xl py-4 md:py-0 transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
-          <Package className={`w-8 h-8 md:w-20 md:h-20 lg:w-36 lg:h-36 ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`} />
+      <footer className="grid grid-cols-2 lg:grid-cols-3 gap-2 md:gap-8 lg:gap-12 xl:gap-12 shrink-0 h-auto md:h-40 lg:h-48 xl:h-56 2xl:h-64 mb-20 md:mb-4">
+        <div className={`col-span-1 border-2 md:border-4 lg:border-[8px] rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex items-center px-4 md:px-10 lg:px-16 xl:px-20 gap-3 md:gap-8 lg:gap-12 xl:gap-20 shadow-2xl py-4 md:py-0 transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+          <Package className={`w-8 h-8 md:w-20 md:h-20 lg:w-28 lg:h-28 xl:w-36 xl:h-36 2xl:w-48 2xl:h-48 ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`} />
           <div>
-            <p className={`text-xs md:text-2xl lg:text-4xl font-black uppercase mb-1 md:mb-3 lg:mb-6 tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-600'}`}>總項數</p>
-            <p className={`text-2xl md:text-7xl lg:text-[10rem] font-black leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{data.length}</p>
+            <p className={`text-xs md:text-xl lg:text-2xl xl:text-4xl font-black uppercase mb-1 md:mb-2 lg:mb-4 xl:mb-6 tracking-widest ${isDarkMode ? 'text-slate-500' : 'text-slate-600'}`}>總項數</p>
+            <p className={`text-2xl md:text-6xl lg:text-7xl xl:text-[10rem] 2xl:text-[12rem] font-black leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{data.length}</p>
           </div>
         </div>
-        <div className={`col-span-1 border-2 md:border-4 lg:border-[8px] rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex items-center px-4 md:px-10 lg:px-20 gap-3 md:gap-10 lg:gap-20 shadow-2xl py-4 md:py-0 transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
-          <ClipboardCheck className={`w-8 h-8 md:w-20 md:h-20 lg:w-36 lg:h-36 ${isDarkMode ? 'text-emerald-500' : 'text-emerald-600'}`} />
+        <div className={`col-span-1 border-2 md:border-4 lg:border-[8px] rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex items-center px-4 md:px-10 lg:px-16 xl:px-20 gap-3 md:gap-8 lg:gap-12 xl:gap-20 shadow-2xl py-4 md:py-0 transition-all ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+          <ClipboardCheck className={`w-8 h-8 md:w-20 md:h-20 lg:w-28 lg:h-28 xl:w-36 xl:h-36 2xl:w-48 2xl:h-48 ${isDarkMode ? 'text-emerald-500' : 'text-emerald-600'}`} />
           <div>
-            <p className={`text-xs md:text-2xl lg:text-4xl font-black uppercase mb-1 md:mb-3 lg:mb-6 tracking-widest ${isDarkMode ? 'text-emerald-600' : 'text-emerald-700'}`}>已完成</p>
-            <p className={`text-2xl md:text-7xl lg:text-[10rem] font-black leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{data.filter(i => i.actualQty > 0).length}</p>
+            <p className={`text-xs md:text-xl lg:text-2xl xl:text-4xl font-black uppercase mb-1 md:mb-2 lg:mb-4 xl:mb-6 tracking-widest ${isDarkMode ? 'text-emerald-600' : 'text-emerald-700'}`}>已完成</p>
+            <p className={`text-2xl md:text-6xl lg:text-7xl xl:text-[10rem] 2xl:text-[12rem] font-black leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{data.filter(i => i.actualQty > 0).length}</p>
           </div>
         </div>
-        <button onClick={() => setShowUnscannedList(true)} className={`col-span-2 lg:col-span-1 border-2 md:border-4 lg:border-[8px] hover:border-amber-500 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex items-center justify-center lg:justify-start px-4 md:px-10 lg:px-20 gap-3 md:gap-10 lg:gap-20 transition-all group shadow-2xl py-4 md:py-0 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
-          <AlertCircle className="text-amber-500 group-hover:scale-110 transition-transform w-8 h-8 md:w-20 md:h-20 lg:w-36 lg:h-36" />
+        <button onClick={() => setShowUnscannedList(true)} className={`col-span-2 lg:col-span-1 border-2 md:border-4 lg:border-[8px] hover:border-amber-500 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex items-center justify-center lg:justify-start px-4 md:px-10 lg:px-16 xl:px-20 gap-3 md:gap-8 lg:gap-12 xl:gap-20 transition-all group shadow-2xl py-4 md:py-0 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-300 shadow-sm'}`}>
+          <AlertCircle className="text-amber-500 group-hover:scale-110 transition-transform w-8 h-8 md:w-20 md:h-20 lg:w-28 lg:h-28 xl:w-36 xl:h-36 2xl:w-48 2xl:h-48" />
           <div className="text-left">
-            <p className={`text-xs md:text-2xl lg:text-4xl font-black uppercase mb-1 md:mb-3 lg:mb-6 tracking-widest ${isDarkMode ? 'text-amber-600' : 'text-amber-700'}`}>未盤項 (檢視)</p>
-            <p className={`text-2xl md:text-7xl lg:text-[10rem] font-black leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{data.filter(i => i.actualQty === 0 && i.bookQty > 0).length}</p>
+            <p className={`text-xs md:text-xl lg:text-2xl xl:text-4xl font-black uppercase mb-1 md:mb-2 lg:mb-4 xl:mb-6 tracking-widest ${isDarkMode ? 'text-amber-600' : 'text-amber-700'}`}>未盤項 (檢視)</p>
+            <p className={`text-2xl md:text-6xl lg:text-7xl xl:text-[10rem] 2xl:text-[12rem] font-black leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{data.filter(i => i.actualQty === 0 && i.bookQty > 0).length}</p>
           </div>
         </button>
       </footer>
@@ -881,7 +881,7 @@ const App: React.FC = () => {
                 <button onClick={() => setIsCreatingNew(true)} className={`flex-1 md:flex-none px-4 md:px-12 py-3 md:py-6 rounded-xl md:rounded-3xl font-black text-lg md:text-3xl transition-all ${isCreatingNew ? 'bg-white text-red-600 shadow-2xl scale-105 md:scale-110' : 'bg-red-700 text-red-200'}`}>新建</button>
               </div>
             </div>
-            <div className="flex-1 overflow-hidden flex min-h-[400px] md:min-h-[600px]">
+            <div className="flex-1 overflow-hidden flex min-h-[300px] md:min-h-[400px]">
               {isCreatingNew ? (
                 <div className={`flex-1 p-6 md:p-24 flex flex-col justify-center overflow-y-auto ${isDarkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
                   <div className="max-w-3xl mx-auto w-full space-y-4 md:space-y-10">
