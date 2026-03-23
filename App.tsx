@@ -478,8 +478,8 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 md:mb-3 lg:mb-4 shrink-0 gap-2 md:gap-0">
-        <div className="w-full md:w-auto pb-1 md:pb-0">
+      <header className="flex flex-col md:flex-row md:flex-wrap justify-between items-start md:items-center mb-2 md:mb-3 lg:mb-4 shrink-0 gap-2 md:gap-3">
+        <div className="w-full md:w-auto pb-1 md:pb-0 shrink-0">
           <div className="flex flex-wrap gap-1 md:gap-1.5 lg:gap-2 items-stretch">
             
             <div className="flex flex-col gap-0.5">
@@ -602,13 +602,13 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="hidden md:flex flex-col items-end text-right pb-1">
-            <h1 className="text-xs md:text-sm lg:text-base font-black tracking-tighter text-white leading-none mb-1 whitespace-nowrap">大豐資訊盤點系統</h1>
-            <div className="bg-blue-600/20 text-blue-500 font-bold px-2 py-0.5 rounded-full text-[10px] lg:text-xs tracking-widest uppercase border border-blue-500/30">雲端備份就緒</div>
+        <div className="hidden md:flex flex-col items-end text-right pb-1 shrink-0 ml-auto">
+            <h1 className={`text-xs md:text-sm lg:text-base font-black tracking-tighter leading-none mb-1 whitespace-nowrap ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>大豐資訊盤點系統</h1>
+            <div className={`font-bold px-2 py-0.5 rounded-full text-[10px] lg:text-xs tracking-widest uppercase border ${isDarkMode ? 'bg-blue-600/20 text-blue-400 border-blue-500/30' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>雲端備份就緒</div>
         </div>
         {/* 手機版標題簡化 */}
         <div className="md:hidden w-full flex justify-between items-center mt-1 px-1">
-            <h1 className="text-sm font-black tracking-tight text-white">大豐資訊盤點系統</h1>
+            <h1 className={`text-sm font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>大豐資訊盤點系統</h1>
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
         </div>
       </header>
