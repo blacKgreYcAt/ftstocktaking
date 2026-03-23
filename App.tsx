@@ -386,7 +386,7 @@ const App: React.FC = () => {
       .map(item => {
         const col1 = pad(warehouseCode, 15);
         const col2 = pad(workId, 20);
-        const col3 = pad(item.location || ' ', 12);
+        const col3 = pad(item.location || currentLocation || ' ', 12);
         const col4 = pad(item.barcode || item.productCode, 32);
         const col5 = pad(item.actualQty.toString(), 56);
         const col6 = suffix;
@@ -765,9 +765,9 @@ const App: React.FC = () => {
                 </div>
               </div>
               <div className="flex-1 border-b-2 border-slate-800/50 flex flex-col justify-center px-6 md:px-16 py-6 md:py-0">
-                <div className="flex items-center gap-2 md:gap-4 mb-2 text-slate-500 font-black text-lg md:text-xl uppercase tracking-widest"><Info size={20} className="md:w-[28px] md:h-[28px]" /> 款式代號 / 條碼</div>
-                <p className="text-4xl md:text-6xl font-black text-blue-400 font-mono tracking-tighter leading-none break-all">{lastScanned.productCode}</p>
-                <p className="text-xl md:text-3xl font-bold text-slate-600 font-mono mt-2">{lastScanned.barcode}</p>
+                <div className="flex items-center gap-2 md:gap-4 mb-2 text-slate-500 font-black text-xl md:text-3xl uppercase tracking-widest"><Info size={20} className="md:w-[28px] md:h-[28px]" /> 款式代號 / 條碼</div>
+                <p className="text-5xl md:text-8xl font-black text-blue-400 font-mono tracking-tighter leading-none break-all">{lastScanned.productCode}</p>
+                <p className="text-3xl md:text-5xl font-bold text-slate-600 font-mono mt-4">{lastScanned.barcode}</p>
               </div>
             </div>
           ) : (
