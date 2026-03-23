@@ -616,8 +616,8 @@ const App: React.FC = () => {
         </div>
 
         <div className="hidden md:flex flex-col items-end text-right pb-1">
-            <h1 className="text-3xl lg:text-6xl font-black tracking-tighter text-white leading-none mb-3">大豐資訊盤點系統</h1>
-            <div className="bg-blue-600/20 text-blue-500 font-bold px-6 py-2 rounded-full text-xl lg:text-2xl tracking-[0.4em] uppercase border border-blue-500/30">雲端備份就緒</div>
+            <h1 className="text-2xl lg:text-4xl font-black tracking-tighter text-white leading-none mb-3 whitespace-nowrap">大豐資訊盤點系統</h1>
+            <div className="bg-blue-600/20 text-blue-500 font-bold px-6 py-2 rounded-full text-lg lg:text-xl tracking-[0.4em] uppercase border border-blue-500/30">雲端備份就緒</div>
         </div>
         {/* 手機版標題簡化 */}
         <div className="md:hidden w-full flex justify-between items-center mt-2 px-1">
