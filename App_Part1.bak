@@ -1,0 +1,253 @@
+/* App.tsx Part 1 (Lines 1-300) */
+
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { 
+  FileDown, CheckCircle2, Search,
+  ScanBarcode, FileSpreadsheet, X,
+  Link, Info, Package, ClipboardCheck, AlertCircle, PlusCircle, MapPin, Clock, User,
+  Pause, Play, LogOut, Edit3, Hash, CloudSync, CloudCheck, CloudOff, Menu,
+  RefreshCw, AlertTriangle, Terminal, Bug,
+  Sun, Moon, BookOpen, ChevronRight, LayoutDashboard, TrendingUp, TrendingDown, DollarSign, BarChart3,
+  Settings
+} from 'lucide-react';
+import * as XLSX from 'xlsx';
+import { 
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid 
+} from 'recharts';
+import { InventoryItem, LogEntry } from './types';
+import { audioService } from './services/audioService';
+
+const STORAGE_KEY = 'dafeng_inventory_local_v11';
+const LOGS_KEY = 'dafeng_inventory_logs_v1';
+
+type TimeFormat = 'off' | 'datetime' | 'date';
+type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
+
+const APP_VERSION = "v1.2.5";
+const UPDATE_NOTES = [
+  "優化 RWD 響應式佈局，適配筆記型電腦與行動裝置。",
+  "強化淺色模式（白色背景）下的視覺對比度與易讀性。",
+  "新增軟體更新說明與使用教學功能。",
+  "優化掃描邏輯與語音提示，提升作業效率。",
+  "修正部分已知介面顯示問題。"
+];
+
+const GUIDE_STEPS = [
+  {
+    title: "步驟 1：匯入盤點資料",
+    content: "點擊頂端「匯入」按鈕，上傳包含產品型號、條碼、品名、顏色、尺寸及帳面數量的 Excel 或 CSV 檔案。系統將自動解析並建立盤點清單。"
+  },
+  {
+    title: "步驟 2：設定人員與倉庫",
+    content: "在「人員/倉庫」欄位輸入您的姓名與目前作業的倉庫代碼（預設為 T0300）。這些資訊將包含在最終匯出的報表中。"
+  },
+  {
+    title: "步驟 3：開始掃描盤點",
+    content: "確保「暫停」狀態已解除。在掃描框中輸入條碼進行掃描。系統會自動比對資料，累加實盤數量並即時計算庫存差異。"
+  },
+  {
+    title: "步驟 4：處理未知條碼",
+    content: "若掃描到不在清單中的條碼，系統會彈出對應視窗。您可以選擇「搜尋」現有產品進行條碼綁定，或選擇「新建」直接建立新的產品品項。"
+  },
+  {
+    title: "步驟 5：檢視與匯出",
+    content: "作業中可點擊底部「未盤項」查看尚未清點的貨品。完成後點擊「結束」按鈕，系統將產生包含所有盤點數據的 Excel 報表供下載。"
+  }
+];
+
+const App: React.FC = () => {
+  const [data, setData] = useState<InventoryItem[]>([]);
+  const [lastScanned, setLastScanned] = useState<InventoryItem | null>(null);
+  const [inputValue, setInputValue] = useState('');
+  const [scanQty, setScanQty] = useState('1');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  
+  const [showUnscannedList, setShowUnscannedList] = useState(false);
+  const [showMappingModal, setShowMappingModal] = useState(false);
+  const [unknownBarcode, setUnknownBarcode] = useState('');
+  const [mappingSearch, setMappingSearch] = useState('');
+  
+  const [newProductName, setNewProductName] = useState('');
+  const [newProductCode, setNewProductCode] = useState('');
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const [operatorName, setOperatorName] = useState('');
+  const [warehouseCode, setWarehouseCode] = useState('T0301');
+  const [workIdSuffix, setWorkIdSuffix] = useState('FT015');
+  const [fileSuffix, setFileSuffix] = useState('0 00000021');
+  const [shelfEnabled, setShelfEnabled] = useState(true);
+  const [currentShelf, setCurrentShelf] = useState('00');
+  const [timeFormat, setTimeFormat] = useState<TimeFormat>('date');
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  const dataRef = useRef(data);
+  const configRef = useRef({ scanQty, shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode });
+
+  useEffect(() => { dataRef.current = data; }, [data]);
+  useEffect(() => {
+    configRef.current = { scanQty, shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode };
+  }, [scanQty, shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode]);
+  
+  const inputRef = useRef<HTMLInputElement>(null);
+  const qtyRef = useRef<HTMLInputElement>(null);
+  const shelfRef = useRef<HTMLInputElement>(null);
+
+  const addLog = useCallback((type: LogEntry['type'], message: string, details?: any) => {
+    const newLog: LogEntry = {
+      timestamp: new Date().toISOString(),
+      type,
+      message,
+      details
+    };
+    setLogs(prev => {
+      const updated = [newLog, ...prev].slice(0, 1000); 
+      localStorage.setItem(LOGS_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const savedLogs = localStorage.getItem(LOGS_KEY);
+    
+    if (savedLogs) {
+      try { setLogs(JSON.parse(savedLogs)); } catch (e) { console.error(e); }
+    }
+
+    const handleError = (event: ErrorEvent) => {
+      addLog('error', `Runtime Error: ${event.message}`, {
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        stack: event.error?.stack
+      });
+    };
+
+    const handleRejection = (event: PromiseRejectionEvent) => {
+      addLog('error', `Unhandled Rejection: ${event.reason?.message || String(event.reason)}`, {
+        reason: event.reason
+      });
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleRejection);
+
+    addLog('system', '系統啟動');
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.items?.length > 0) setData(parsed.items);
+        if (parsed.config) {
+          setShelfEnabled(!!parsed.config.shelfEnabled);
+          setCurrentShelf(parsed.config.currentShelf || '');
+          setTimeFormat(parsed.config.timeFormat === 'off' ? 'date' : (parsed.config.timeFormat || 'date'));
+          setOperatorName(parsed.config.operatorName || '');
+          setWarehouseCode(parsed.config.warehouseCode || 'T0301');
+          setIsPaused(!!parsed.config.isPaused);
+          if (parsed.config.isDarkMode !== undefined) setIsDarkMode(parsed.config.isDarkMode);
+        }
+      } catch (e) { console.error(e); }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (data.length > 0 || operatorName || warehouseCode !== 'T0300' || shelfEnabled || timeFormat !== 'off' || isPaused || !isDarkMode) {
+      const config = { shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: data, config }));
+    }
+  }, [data, shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode]);
+
+  const focusInput = useCallback(() => {
+    const active = document.activeElement;
+    if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement) return;
+
+    if (inputRef.current && !showUnscannedList && !showMappingModal && !isPaused) {
+      inputRef.current.focus();
+    }
+  }, [showUnscannedList, showMappingModal, isPaused]);
+
+  useEffect(() => {
+    focusInput();
+    const h = () => focusInput();
+    window.addEventListener('click', h);
+    return () => {
+      window.removeEventListener('click', h);
+    };
+  }, [focusInput]);
+
+  const backupToCloud = async (itemsToSync: InventoryItem[]) => {
+    if (itemsToSync.length === 0) return;
+    setSyncStatus('syncing');
+    try {
+      const response = await fetch('/api/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operator: operatorName,
+          items: itemsToSync.filter(i => i.actualQty > 0)
+        })
+      });
+      if (response.ok) {
+        setSyncStatus('success');
+      } else {
+        setSyncStatus('error');
+      }
+    } catch (e) {
+      console.error("Backup failed", e);
+      setSyncStatus('error');
+    }
+  };
+
+  const getInventoryDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d;
+  };
+
+  const getFormattedTime = () => {
+    if (timeFormat === 'off') return undefined;
+    const dateObj = getInventoryDate();
+    const y = dateObj.getFullYear();
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    if (timeFormat === 'date') return `${y}/${m}/${d}`;
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    return `${y}/${m}/${d} ${hh}:${mm}`;
+  };
+
+  const processBarcode = (code: string, qtyOverride?: number) => {
+    const { isPaused, scanQty, shelfEnabled, currentShelf, timeFormat, operatorName } = configRef.current;
+    const currentData = dataRef.current;
+
+    if (isPaused) return;
+
+    let targetCode = code.trim();
+    let currentAddQty = qtyOverride !== undefined ? qtyOverride : (parseFloat(scanQty) || 1);
+
+    if (targetCode.includes('*')) {
+      const parts = targetCode.split('*');
+      if (parts.length === 2) {
+        const manualQty = parseFloat(parts[0]);
+        if (!isNaN(manualQty)) {
+          currentAddQty = manualQty;
+          targetCode = parts[1].trim();
+        }
+      }
+    }
+
+    if (!targetCode || currentData.length === 0) return;
+
+    const index = currentData.findIndex(item => 
+      item.barcode === targetCode || item.productCode === targetCode || item.mappedBarcodes?.includes(targetCode)
+    );

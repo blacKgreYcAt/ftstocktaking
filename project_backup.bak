@@ -1,0 +1,204 @@
+# 大豐資訊盤點系統 - 專案備份 (Project Backup)
+# 備份日期: 2026-03-24
+
+--- FILE: package.json ---
+{
+  "name": "大豐資訊盤點系統",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^1.37.0",
+    "html5-qrcode": "2.3.8",
+    "lucide-react": "^0.562.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "recharts": "^3.8.0",
+    "xlsx": "0.18.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
+
+--- FILE: vite.config.ts ---
+import path from 'path';
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, '.', '');
+    return {
+      server: {
+        port: 3000,
+        host: '0.0.0.0',
+      },
+      plugins: [react()],
+      define: {
+        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+      },
+      resolve: {
+        alias: {
+          '@': path.resolve(__dirname, '.'),
+        }
+      }
+    };
+});
+
+--- FILE: index.html ---
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>大豐資訊盤點系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #020617;
+            height: 100%;
+        }
+        
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0px 1000px #1e293b inset;
+            -webkit-text-fill-color: white;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 20px; border: 2px solid transparent; background-clip: content-box; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "xlsx": "https://esm.sh/xlsx@0.18.5",
+    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
+    "html5-qrcode": "https://esm.sh/html5-qrcode@2.3.8"
+  }
+}
+</script>
+</head>
+<body class="h-full bg-slate-950">
+    <div id="root" class="h-full"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
+
+--- FILE: index.tsx ---
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error("Could not find root element to mount to");
+}
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+--- FILE: types.ts ---
+export interface LogEntry {
+  timestamp: string;
+  type: 'info' | 'error' | 'scan' | 'system';
+  message: string;
+  details?: any;
+}
+
+export interface InventoryItem {
+  barcode: string;      // 條碼編號 (國際條碼)
+  productCode: string;  // 產品代號 (款式代號)
+  name: string;         // 品名 (商品名稱)
+  price?: number;       // 含稅定價
+  color?: string;       // 顏色
+  size?: string;        // 尺寸
+  bookQty: number;      // 期末數量 (合計)
+  actualQty: number;    // 盤點數量
+  diff: number;         // 差異數
+  shelf?: string;    // 儲位資訊
+  scanTime?: string;    // 掃描日期時間
+  operator?: string;    // 作業員
+  originalRow?: any;    // 原始 Excel 完整列資料
+  mappedBarcodes?: string[]; // 記錄額外關聯到此項目的錯誤條碼
+  remarks?: string;     // 額外備註
+}
+
+export interface ScanResult {
+  success: boolean;
+  message: string;
+  item?: InventoryItem;
+}
+
+export interface AISearchResult {
+  text: string;
+  sources: { title: string; uri: string }[];
+}
+
+--- FILE: services/audioService.ts ---
+class AudioService {
+  private audioCtx: AudioContext | null = null;
+
+  private init() {
+    if (!this.audioCtx) {
+      this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
+    }
+  }
+
+  playFeedback(type: 'success' | 'error' | 'mapping') {
+    this.init();
+    if (!this.audioCtx) return;
+    const osc = this.audioCtx.createOscillator();
+    const gain = this.audioCtx.createGain();
+    
+    let freq = 880; 
+    if (type === 'error') freq = 220; 
+    if (type === 'mapping') freq = 440; 
+
+    osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, this.audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, this.audioCtx.currentTime + 0.15);
+    
+    osc.connect(gain);
+    gain.connect(this.audioCtx.destination);
+    
+    osc.start();
+    osc.stop(this.audioCtx.currentTime + 0.15);
+  }
+
+  speakSuccess(name: string, qty: number) {
+    this.playFeedback('success');
+  }
+
+  speakError() {
+    this.playFeedback('error');
+  }
+
+  speakMappingSuccess() {
+    this.playFeedback('mapping');
+  }
+}
+
+export const audioService = new AudioService();
+
+--- FILE: App.tsx ---
+(由於 App.tsx 較長，請參考原始檔案或使用內建匯出功能)
