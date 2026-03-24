@@ -373,9 +373,10 @@ const App: React.FC = () => {
     const workId = `${yyyymmdd}${workIdSuffix}`;
     const suffix = fileSuffix;
     
-    // Helper to pad strings to fixed width
+    // Helper to pad strings to fixed width and FORCE exact length
     const pad = (str: string, length: number) => {
-      return (str || '').toString().padEnd(length, ' ');
+      const s = (str || '').toString();
+      return s.padEnd(length, ' ').slice(0, length);
     };
 
     const lines = data
@@ -392,7 +393,11 @@ const App: React.FC = () => {
       });
 
     const content = lines.join('\r\n') + '\r\n';
-    const blob = new Blob([content], { type: 'text/plain' });
+    
+    // Use TextEncoder to ensure clean output without BOM
+    const encoder = new TextEncoder();
+    const uint8Array = encoder.encode(content);
+    const blob = new Blob([uint8Array], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -445,22 +450,25 @@ const App: React.FC = () => {
 
       // 1. 統一換行符號為 \r\n (Windows 格式)
       // 2. 確保結尾有換行
-      // 3. 嘗試替換硬編碼的後綴 (選用)
-      let repaired = content.replace(/\r?\n/g, '\r\n');
+      // 3. 強制每一行進行寬度校正 (防止原始檔案寬度不一)
+      const rawLines = content.split(/\r?\n/).filter(l => l.trim().length > 0);
       
-      // 如果使用者有設定新的後綴，嘗試在轉檔時替換舊的 (假設舊的是 FT015)
-      if (workIdSuffix !== 'FT015') {
-        repaired = repaired.replace(/FT015/g, workIdSuffix);
-      }
-      if (fileSuffix !== '0 00000021') {
-        repaired = repaired.replace(/0 00000021/g, fileSuffix);
-      }
+      const fixedLines = rawLines.map(line => {
+        let l = line;
+        // 嘗試替換硬編碼的後綴
+        if (workIdSuffix !== 'FT015') l = l.replace(/FT015/g, workIdSuffix);
+        if (fileSuffix !== '0 00000021') l = l.replace(/0 00000021/g, fileSuffix);
+        
+        // 如果行長度不正確，嘗試重新格式化 (這部分較複雜，先做基礎長度切分)
+        // 這裡我們假設使用者只是要修正換行，但如果長度不對，我們強制截斷或補齊到 145
+        return l.padEnd(145, ' ').slice(0, 145);
+      });
 
-      if (!repaired.endsWith('\r\n')) {
-        repaired += '\r\n';
-      }
+      const repaired = fixedLines.join('\r\n') + '\r\n';
 
-      const blob = new Blob([repaired], { type: 'text/plain' });
+      const encoder = new TextEncoder();
+      const uint8Array = encoder.encode(repaired);
+      const blob = new Blob([uint8Array], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
