@@ -5,7 +5,7 @@ import {
   ScanBarcode, FileSpreadsheet, X,
   Link, Info, Package, ClipboardCheck, AlertCircle, PlusCircle, MapPin, Clock, User,
   Pause, Play, LogOut, Edit3, Hash, CloudSync, CloudCheck, CloudOff, Menu,
-  RefreshCw, AlertTriangle, Terminal, Bug, FileUp,
+  RefreshCw, AlertTriangle, Terminal, Bug,
   Sun, Moon, BookOpen, ChevronRight, LayoutDashboard, TrendingUp, TrendingDown, DollarSign, BarChart3
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -78,8 +78,8 @@ const App: React.FC = () => {
   const [warehouseCode, setWarehouseCode] = useState('T0300');
   const [workIdSuffix, setWorkIdSuffix] = useState('FT015');
   const [fileSuffix, setFileSuffix] = useState('0 00000021');
-  const [locationEnabled, setLocationEnabled] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState('');
+  const [shelfEnabled, setShelfEnabled] = useState(false);
+  const [currentShelf, setCurrentShelf] = useState('');
   const [timeFormat, setTimeFormat] = useState<TimeFormat>('date');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
@@ -87,16 +87,16 @@ const App: React.FC = () => {
 
   // Refs to avoid stale closures
   const dataRef = useRef(data);
-  const configRef = useRef({ scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode });
+  const configRef = useRef({ scanQty, shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode });
 
   useEffect(() => { dataRef.current = data; }, [data]);
   useEffect(() => {
-    configRef.current = { scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode };
-  }, [scanQty, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode]);
+    configRef.current = { scanQty, shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode };
+  }, [scanQty, shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode]);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const qtyRef = useRef<HTMLInputElement>(null);
-  const locationRef = useRef<HTMLInputElement>(null);
+  const shelfRef = useRef<HTMLInputElement>(null);
 
   const addLog = useCallback((type: LogEntry['type'], message: string, details?: any) => {
     const newLog: LogEntry = {
@@ -146,8 +146,8 @@ const App: React.FC = () => {
         const parsed = JSON.parse(saved);
         if (parsed.items?.length > 0) setData(parsed.items);
         if (parsed.config) {
-          setLocationEnabled(!!parsed.config.locationEnabled);
-          setCurrentLocation(parsed.config.currentLocation || '');
+          setShelfEnabled(!!parsed.config.shelfEnabled);
+          setCurrentShelf(parsed.config.currentShelf || '');
           setTimeFormat(parsed.config.timeFormat === 'off' ? 'date' : (parsed.config.timeFormat || 'date'));
           setOperatorName(parsed.config.operatorName || '');
           setWarehouseCode(parsed.config.warehouseCode || 'T0300');
@@ -159,11 +159,11 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (data.length > 0 || operatorName || warehouseCode !== 'T0300' || locationEnabled || timeFormat !== 'off' || isPaused || !isDarkMode) {
-      const config = { locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode };
+    if (data.length > 0 || operatorName || warehouseCode !== 'T0300' || shelfEnabled || timeFormat !== 'off' || isPaused || !isDarkMode) {
+      const config = { shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode };
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: data, config }));
     }
-  }, [data, locationEnabled, currentLocation, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode]);
+  }, [data, shelfEnabled, currentShelf, timeFormat, operatorName, warehouseCode, isPaused, isDarkMode]);
 
   // Focus Logic
   const focusInput = useCallback(() => {
@@ -236,7 +236,7 @@ const App: React.FC = () => {
 
   // --- 核心邏輯重構：處理條碼 (共用於 USB 槍與鏡頭) ---
   const processBarcode = (code: string, qtyOverride?: number) => {
-    const { isPaused, scanQty, locationEnabled, currentLocation, timeFormat, operatorName } = configRef.current;
+    const { isPaused, scanQty, shelfEnabled, currentShelf, timeFormat, operatorName } = configRef.current;
     const currentData = dataRef.current;
 
     if (isPaused) return;
@@ -271,7 +271,7 @@ const App: React.FC = () => {
       
       addLog('scan', `成功掃描: ${item.productCode}`, { barcode: targetCode, qty: currentAddQty });
 
-      if (locationEnabled && currentLocation.trim()) item.location = currentLocation.trim();
+      if (shelfEnabled && currentShelf.trim()) item.shelf = currentShelf.trim();
       const t = getFormattedTime();
       if (t) item.scanTime = t;
       if (operatorName.trim()) item.operator = operatorName.trim();
@@ -330,7 +330,7 @@ const App: React.FC = () => {
       bookQty: 0,
       actualQty: parseFloat(scanQty) || 1,
       diff: parseFloat(scanQty) || 1,
-      location: (locationEnabled && currentLocation.trim()) ? currentLocation.trim() : undefined,
+      shelf: (shelfEnabled && currentShelf.trim()) ? currentShelf.trim() : undefined,
       scanTime: getFormattedTime(),
       operator: operatorName.trim() || undefined,
       originalRow: { '國際條碼': unknownBarcode, '款式代號': newProductCode.trim(), '商品名稱': newProductName.trim(), '合計': 0 }
@@ -352,7 +352,7 @@ const App: React.FC = () => {
       '實際盤點': i.actualQty,
       '差異': i.diff,
       '作業員': i.operator || '',
-      '儲位': i.location || '',
+      '貨架': i.shelf || '',
       '盤點時間': i.scanTime || '',
       '手動關聯條碼': i.mappedBarcodes?.join(', ')
     })));
@@ -384,10 +384,10 @@ const App: React.FC = () => {
       .map(item => {
         const col1 = pad(warehouseCode, 15);
         const col2 = pad(workId, 20);
-        const col3 = pad(item.location || currentLocation || ' ', 12);
+        const col3 = pad(item.shelf || currentShelf || ' ', 12);
         const col4 = pad(item.barcode || item.productCode, 32);
         const col5 = pad(item.actualQty.toString(), 56);
-        const col6 = suffix;
+        const col6 = pad(suffix, 10);
         
         return `${col1}${col2}${col3}${col4}${col5}${col6}`;
       });
@@ -402,7 +402,7 @@ const App: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `大豐盤點機格式_${yyyymmdd}.txt`;
+    a.download = `dafeng_inv_${yyyymmdd}.TXT`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -438,56 +438,6 @@ const App: React.FC = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     addLog('info', '匯出作業紀錄檔');
-  };
-
-  const handleRepairTxt = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      let content = ev.target?.result as string;
-      if (!content) return;
-
-      // 0. 手動移除可能存在的 UTF-8 BOM
-      content = content.replace(/^\uFEFF/, '');
-
-      // 1. 取得所有非空白行
-      const rawLines = content.split(/\r?\n/).filter(l => l.trim().length > 0);
-      
-      // 2. 強制每一行進行 145 字元寬度校正
-      const fixedLines = rawLines.map(line => {
-        let l = line;
-        // 嘗試替換硬編碼的後綴
-        if (workIdSuffix !== 'FT015') l = l.replace(/FT015/g, workIdSuffix);
-        if (fileSuffix !== '0 00000021') l = l.replace(/0 00000021/g, fileSuffix);
-        
-        // 強制鎖定 145 字元
-        return l.padEnd(145, ' ').slice(0, 145);
-      });
-
-      // 3. 結合行，但最後一行絕對不加換行符號 (防止 ERP 讀取空行崩潰)
-      const repaired = fixedLines.join('\r\n');
-
-      // 4. 使用二進位流輸出，確保編碼純淨
-      const encoder = new TextEncoder();
-      const uint8Array = encoder.encode(repaired);
-      const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
-      
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `FIXED_${file.name}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      addLog('info', '執行深度 TXT 格式修復', { fileName: file.name, lineCount: fixedLines.length });
-      alert(`轉檔完成！偵測到 ${fixedLines.length} 行資料，已校正為 ERP 專用格式。請使用下載的 FIXED_${file.name} 匯入。`);
-    };
-    reader.readAsText(file);
-    e.target.value = '';
   };
 
   const handleClearLogs = () => {
@@ -651,7 +601,7 @@ const App: React.FC = () => {
                   <button onClick={() => setTimeFormat('date')} className={`px-2 md:px-4 lg:px-6 xl:px-8 rounded-sm md:rounded-lg text-[10px] md:text-sm lg:text-base xl:text-lg font-black transition-all ${timeFormat === 'date' ? (isDarkMode ? 'bg-slate-700 text-white shadow-sm' : 'bg-slate-300 text-slate-900 shadow-sm') : 'text-slate-600 hover:text-slate-900'}`}>日期</button>
                   <button onClick={() => setTimeFormat('datetime')} className={`px-2 md:px-4 lg:px-6 xl:px-8 rounded-sm md:rounded-lg text-[10px] md:text-sm lg:text-base xl:text-lg font-black transition-all flex items-center gap-1.5 ${timeFormat === 'datetime' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Clock size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" />時間</button>
                 </div>
-                <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />儲位</button>
+                <button onClick={() => setShelfEnabled(!shelfEnabled)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${shelfEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />貨架</button>
                 
                 {/* 擴充設定：作業編號與結尾碼 */}
                 <div className={`h-full flex items-center gap-2 px-3 border-l ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
@@ -692,10 +642,6 @@ const App: React.FC = () => {
                 <button onClick={handleExportLogs} title="匯出紀錄" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
                   <Bug size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
                 </button>
-                <label title="TXT 格式修復轉檔" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border cursor-pointer ${isDarkMode ? 'bg-blue-900/20 border-blue-800 text-blue-400 hover:text-white' : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100'}`}>
-                  <FileUp size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
-                  <input type="file" accept=".txt" onChange={handleRepairTxt} className="hidden" />
-                </label>
                 <button onClick={handleClearLogs} title="清除紀錄" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-400' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-red-500'}`}>
                   <RefreshCw size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
                 </button>
@@ -808,16 +754,16 @@ const App: React.FC = () => {
           </form>
         </section>
 
-        {locationEnabled && (
+        {shelfEnabled && (
           <section className={`w-full md:w-1/4 p-2 md:p-3 lg:p-4 rounded-2xl md:rounded-3xl lg:rounded-[4rem] flex flex-row md:flex-col items-center md:justify-center px-4 md:px-10 lg:px-16 gap-3 md:gap-0 border-2 md:border-4 lg:border-[8px] transition-all ${isDarkMode ? 'bg-amber-900/10 border-amber-800/50' : 'bg-amber-50 border-amber-200 shadow-sm'}`}>
-            <div className={`flex items-center gap-1.5 md:gap-3 lg:gap-6 md:mb-2 lg:mb-4 font-black text-base md:text-2xl lg:text-4xl uppercase tracking-widest shrink-0 ${isDarkMode ? 'text-amber-500' : 'text-amber-600'}`}><MapPin size={20} className="md:w-8 md:h-8 lg:w-[48px] lg:h-[48px]" /> <span className="hidden md:inline">目前</span>儲位</div>
+            <div className={`flex items-center gap-1.5 md:gap-3 lg:gap-6 md:mb-2 lg:mb-4 font-black text-base md:text-2xl lg:text-4xl uppercase tracking-widest shrink-0 ${isDarkMode ? 'text-amber-500' : 'text-amber-600'}`}><MapPin size={20} className="md:w-8 md:h-8 lg:w-[48px] lg:h-[48px]" /> <span className="hidden md:inline">目前</span>貨架</div>
             <input 
-              ref={locationRef}
+              ref={shelfRef}
               type="text" 
-              value={currentLocation} 
-              onChange={(e) => setCurrentLocation(e.target.value)} 
+              value={currentShelf} 
+              onChange={(e) => setCurrentShelf(e.target.value)} 
               onClick={(e) => e.stopPropagation()}
-              placeholder="位置..." 
+              placeholder="貨架..." 
               disabled={isPaused} 
               className={`w-full bg-transparent text-3xl md:text-5xl lg:text-7xl font-black outline-none ${isDarkMode ? 'text-amber-400 placeholder:text-amber-900' : 'text-amber-700 placeholder:text-amber-300'}`} 
               autoComplete="off" 
@@ -1171,7 +1117,7 @@ const App: React.FC = () => {
                         updated[dIdx].mappedBarcodes = [...(updated[dIdx].mappedBarcodes || []), unknownBarcode];
                         updated[dIdx].actualQty += parseFloat(scanQty) || 1;
                         updated[dIdx].diff = updated[dIdx].actualQty - updated[dIdx].bookQty;
-                        if (locationEnabled && currentLocation.trim()) updated[dIdx].location = currentLocation.trim();
+                        if (shelfEnabled && currentShelf.trim()) updated[dIdx].shelf = currentShelf.trim();
                         if (operatorName.trim()) updated[dIdx].operator = operatorName.trim();
                         const t = getFormattedTime(); if (t) updated[dIdx].scanTime = t;
                         setData(updated); setLastScanned(updated[dIdx]); setShowMappingModal(false); audioService.speakMappingSuccess();

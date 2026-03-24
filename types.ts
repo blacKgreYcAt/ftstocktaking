@@ -16,7 +16,7 @@ export interface InventoryItem {
   bookQty: number;      // 期末數量 (合計)
   actualQty: number;    // 盤點數量
   diff: number;         // 差異數
-  location?: string;    // 儲位資訊
+  shelf?: string;    // 儲位資訊
   scanTime?: string;    // 掃描日期時間
   operator?: string;    // 作業員
   originalRow?: any;    // 原始 Excel 完整列資料
