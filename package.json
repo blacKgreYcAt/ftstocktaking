@@ -12,6 +12,7 @@
   "dependencies": {
     "@google/genai": "^1.37.0",
     "html5-qrcode": "2.3.8",
+    "iconv-lite": "^0.7.2",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

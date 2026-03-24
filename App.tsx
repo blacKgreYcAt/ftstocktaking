@@ -76,6 +76,8 @@ const App: React.FC = () => {
 
   const [operatorName, setOperatorName] = useState('');
   const [warehouseCode, setWarehouseCode] = useState('T0300');
+  const [workIdSuffix, setWorkIdSuffix] = useState('FT015');
+  const [fileSuffix, setFileSuffix] = useState('0 00000021');
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [currentLocation, setCurrentLocation] = useState('');
   const [timeFormat, setTimeFormat] = useState<TimeFormat>('date');
@@ -368,8 +370,8 @@ const App: React.FC = () => {
                      (invDate.getMonth() + 1).toString().padStart(2, '0') + 
                      invDate.getDate().toString().padStart(2, '0');
     
-    const workId = `${yyyymmdd}FT015`;
-    const suffix = "0 00000021";
+    const workId = `${yyyymmdd}${workIdSuffix}`;
+    const suffix = fileSuffix;
     
     // Helper to pad strings to fixed width
     const pad = (str: string, length: number) => {
@@ -443,7 +445,17 @@ const App: React.FC = () => {
 
       // 1. 統一換行符號為 \r\n (Windows 格式)
       // 2. 確保結尾有換行
+      // 3. 嘗試替換硬編碼的後綴 (選用)
       let repaired = content.replace(/\r?\n/g, '\r\n');
+      
+      // 如果使用者有設定新的後綴，嘗試在轉檔時替換舊的 (假設舊的是 FT015)
+      if (workIdSuffix !== 'FT015') {
+        repaired = repaired.replace(/FT015/g, workIdSuffix);
+      }
+      if (fileSuffix !== '0 00000021') {
+        repaired = repaired.replace(/0 00000021/g, fileSuffix);
+      }
+
       if (!repaired.endsWith('\r\n')) {
         repaired += '\r\n';
       }
@@ -629,6 +641,26 @@ const App: React.FC = () => {
                 </div>
                 <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />儲位</button>
                 
+                {/* 擴充設定：作業編號與結尾碼 */}
+                <div className={`h-full flex items-center gap-2 px-3 border-l ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-bold opacity-50">作業編號後綴</span>
+                    <input 
+                      value={workIdSuffix} 
+                      onChange={(e) => setWorkIdSuffix(e.target.value)}
+                      className={`w-16 md:w-24 text-[10px] md:text-sm font-black bg-transparent border-b border-dashed ${isDarkMode ? 'border-slate-700 text-blue-400' : 'border-slate-300 text-blue-600'}`}
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-bold opacity-50">檔案結尾碼</span>
+                    <input 
+                      value={fileSuffix} 
+                      onChange={(e) => setFileSuffix(e.target.value)}
+                      className={`w-24 md:w-32 text-[10px] md:text-sm font-black bg-transparent border-b border-dashed ${isDarkMode ? 'border-slate-700 text-indigo-400' : 'border-slate-300 text-indigo-600'}`}
+                    />
+                  </div>
+                </div>
+
                 {/* 盤點日期顯示 (T-1) */}
                 <div className={`h-full flex flex-col items-center justify-center px-2 md:px-4 border-l ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
                   <span className={`text-[8px] md:text-[10px] font-bold uppercase opacity-50 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>盤點日期 (T-1)</span>
