@@ -202,13 +202,26 @@ const App: React.FC = () => {
     }
   };
 
+  const getInventoryDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d;
+  };
+
   const getFormattedTime = () => {
     if (timeFormat === 'off') return undefined;
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
+    
+    // 取得當前時間並調整為 T-1 (前一天)，以符合盤點抓取前一天庫存的需求
+    const dateObj = getInventoryDate();
+    
+    const y = dateObj.getFullYear();
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    
     if (timeFormat === 'date') return `${y}/${m}/${d}`;
+    
+    // 若為 datetime 格式，日期顯示 T-1，時間則保留掃描當下的時分
+    const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
     return `${y}/${m}/${d} ${hh}:${mm}`;
@@ -324,6 +337,9 @@ const App: React.FC = () => {
 
   const handleExport = () => {
     if (data.length === 0) return;
+    const invDate = getInventoryDate();
+    const dateStr = `${invDate.getFullYear()}${(invDate.getMonth() + 1).toString().padStart(2, '0')}${invDate.getDate().toString().padStart(2, '0')}`;
+    
     const ws = XLSX.utils.json_to_sheet(data.map(i => ({
       ...i.originalRow,
       '實際盤點': i.actualQty,
@@ -335,17 +351,17 @@ const App: React.FC = () => {
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "盤點結果");
-    XLSX.writeFile(wb, `大豐盤點_${new Date().toLocaleDateString()}.xlsx`);
+    XLSX.writeFile(wb, `大豐盤點_${dateStr}.xlsx`);
     addLog('info', '匯出 Excel 報表', { itemCount: data.length });
   };
 
   const handleExportMachineFormat = () => {
     if (data.length === 0) return;
     
-    const now = new Date();
-    const yyyymmdd = now.getFullYear().toString() + 
-                     (now.getMonth() + 1).toString().padStart(2, '0') + 
-                     now.getDate().toString().padStart(2, '0');
+    const invDate = getInventoryDate();
+    const yyyymmdd = invDate.getFullYear().toString() + 
+                     (invDate.getMonth() + 1).toString().padStart(2, '0') + 
+                     invDate.getDate().toString().padStart(2, '0');
     
     const workId = `${yyyymmdd}FT015`;
     const suffix = "0 00000021";
@@ -471,9 +487,33 @@ const App: React.FC = () => {
               {syncStatus === 'syncing' ? '雲端同步中...' : syncStatus === 'error' ? '同步發生錯誤' : '資料已安全備份'}
             </span>
           </div>
+
+          {/* 暫停時的手動存檔區 */}
+          <div className="flex flex-col md:flex-row gap-4 mt-8 md:mt-12">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleExport();
+              }}
+              className={`flex items-center justify-center gap-3 px-8 py-4 md:px-12 md:py-6 rounded-2xl md:rounded-3xl font-black text-xl md:text-4xl transition-all shadow-2xl border-2 ${isDarkMode ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-700' : 'bg-blue-500 border-blue-300 text-white hover:bg-blue-600'}`}
+            >
+              <FileDown size={24} className="md:w-10 md:h-10" />
+              立即存檔 (Excel)
+            </button>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleExportMachineFormat();
+              }}
+              className={`flex items-center justify-center gap-3 px-8 py-4 md:px-12 md:py-6 rounded-2xl md:rounded-3xl font-black text-xl md:text-4xl transition-all shadow-2xl border-2 ${isDarkMode ? 'bg-indigo-600 border-indigo-400 text-white hover:bg-indigo-700' : 'bg-indigo-500 border-indigo-300 text-white hover:bg-indigo-600'}`}
+            >
+              <FileDown size={24} className="md:w-10 md:h-10" />
+              存檔 (TXT)
+            </button>
+          </div>
           
           <div className={`mt-10 md:mt-16 px-8 py-4 md:px-12 md:py-6 rounded-2xl border-2 animate-bounce ${isDarkMode ? 'bg-blue-600/20 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'}`}>
-            <span className="text-xl md:text-3xl font-black tracking-widest">點擊任意處繼續盤點</span>
+            <span className="text-xl md:text-3xl font-black tracking-widest">點擊背景任意處繼續盤點</span>
           </div>
         </div>
       )}
@@ -549,6 +589,17 @@ const App: React.FC = () => {
                   <button onClick={() => setTimeFormat('datetime')} className={`px-2 md:px-4 lg:px-6 xl:px-8 rounded-sm md:rounded-lg text-[10px] md:text-sm lg:text-base xl:text-lg font-black transition-all flex items-center gap-1.5 ${timeFormat === 'datetime' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}><Clock size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" />時間</button>
                 </div>
                 <button onClick={() => setLocationEnabled(!locationEnabled)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${locationEnabled ? 'bg-amber-600 border-amber-400 text-white' : (isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-600' : 'bg-slate-100 border-slate-300 text-slate-700')}`}><MapPin size={14} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />儲位</button>
+                
+                {/* 盤點日期顯示 (T-1) */}
+                <div className={`h-full flex flex-col items-center justify-center px-2 md:px-4 border-l ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+                  <span className={`text-[8px] md:text-[10px] font-bold uppercase opacity-50 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>盤點日期 (T-1)</span>
+                  <span className={`text-[10px] md:text-lg font-black ${isDarkMode ? 'text-amber-500' : 'text-amber-600'}`}>
+                    {(() => {
+                      const d = getInventoryDate();
+                      return `${d.getFullYear()}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}`;
+                    })()}
+                  </span>
+                </div>
               </div>
             </div>
 
