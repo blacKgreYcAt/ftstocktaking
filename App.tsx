@@ -5,7 +5,7 @@ import {
   ScanBarcode, FileSpreadsheet, X,
   Link, Info, Package, ClipboardCheck, AlertCircle, PlusCircle, MapPin, Clock, User,
   Pause, Play, LogOut, Edit3, Hash, CloudSync, CloudCheck, CloudOff, Menu,
-  RefreshCw, AlertTriangle, Terminal, Bug,
+  RefreshCw, AlertTriangle, Terminal, Bug, FileUp,
   Sun, Moon, BookOpen, ChevronRight, LayoutDashboard, TrendingUp, TrendingDown, DollarSign, BarChart3
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
@@ -389,7 +389,7 @@ const App: React.FC = () => {
         return `${col1}${col2}${col3}${col4}${col5}${col6}`;
       });
 
-    const content = lines.join('\n');
+    const content = lines.join('\r\n') + '\r\n';
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -430,6 +430,40 @@ const App: React.FC = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     addLog('info', '匯出作業紀錄檔');
+  };
+
+  const handleRepairTxt = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const content = ev.target?.result as string;
+      if (!content) return;
+
+      // 1. 統一換行符號為 \r\n (Windows 格式)
+      // 2. 確保結尾有換行
+      let repaired = content.replace(/\r?\n/g, '\r\n');
+      if (!repaired.endsWith('\r\n')) {
+        repaired += '\r\n';
+      }
+
+      const blob = new Blob([repaired], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `FIXED_${file.name}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      addLog('info', '執行 TXT 格式修復轉檔', { fileName: file.name });
+      alert('轉檔完成！請使用下載的 FIXED_' + file.name + ' 匯入 ERP。');
+    };
+    reader.readAsText(file);
+    // Reset input
+    e.target.value = '';
   };
 
   const handleClearLogs = () => {
@@ -614,6 +648,10 @@ const App: React.FC = () => {
                 <button onClick={handleExportLogs} title="匯出紀錄" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
                   <Bug size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
                 </button>
+                <label title="TXT 格式修復轉檔" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border cursor-pointer ${isDarkMode ? 'bg-blue-900/20 border-blue-800 text-blue-400 hover:text-white' : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100'}`}>
+                  <FileUp size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
+                  <input type="file" accept=".txt" onChange={handleRepairTxt} className="hidden" />
+                </label>
                 <button onClick={handleClearLogs} title="清除紀錄" className={`h-full flex items-center justify-center aspect-square rounded-md md:rounded-lg transition-all border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-red-400' : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-red-500'}`}>
                   <RefreshCw size={16} className="md:w-6 md:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10" />
                 </button>
