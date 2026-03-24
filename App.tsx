@@ -392,12 +392,13 @@ const App: React.FC = () => {
         return `${col1}${col2}${col3}${col4}${col5}${col6}`;
       });
 
-    const content = lines.join('\r\n'); // Removed the trailing + '\r\n'
+    // 結合行，但最後一行絕對不加換行符號 (防止 ERP 讀取空行崩潰)
+    const content = lines.join('\r\n');
     
     // Use TextEncoder to ensure clean output without BOM
     const encoder = new TextEncoder();
     const uint8Array = encoder.encode(content);
-    const blob = new Blob([uint8Array], { type: 'text/plain' });
+    const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -445,30 +446,34 @@ const App: React.FC = () => {
 
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const content = ev.target?.result as string;
+      let content = ev.target?.result as string;
       if (!content) return;
 
-      // 1. 統一換行符號為 \r\n (Windows 格式)
-      // 2. 確保結尾有換行
-      // 3. 強制每一行進行寬度校正 (防止原始檔案寬度不一)
+      // 0. 手動移除可能存在的 UTF-8 BOM
+      content = content.replace(/^\uFEFF/, '');
+
+      // 1. 取得所有非空白行
       const rawLines = content.split(/\r?\n/).filter(l => l.trim().length > 0);
       
+      // 2. 強制每一行進行 145 字元寬度校正
       const fixedLines = rawLines.map(line => {
         let l = line;
         // 嘗試替換硬編碼的後綴
         if (workIdSuffix !== 'FT015') l = l.replace(/FT015/g, workIdSuffix);
         if (fileSuffix !== '0 00000021') l = l.replace(/0 00000021/g, fileSuffix);
         
-        // 如果行長度不正確，嘗試重新格式化 (這部分較複雜，先做基礎長度切分)
-        // 這裡我們假設使用者只是要修正換行，但如果長度不對，我們強制截斷或補齊到 145
+        // 強制鎖定 145 字元
         return l.padEnd(145, ' ').slice(0, 145);
       });
 
-      const repaired = fixedLines.join('\r\n'); // Removed the trailing + '\r\n'
+      // 3. 結合行，但最後一行絕對不加換行符號 (防止 ERP 讀取空行崩潰)
+      const repaired = fixedLines.join('\r\n');
 
+      // 4. 使用二進位流輸出，確保編碼純淨
       const encoder = new TextEncoder();
       const uint8Array = encoder.encode(repaired);
-      const blob = new Blob([uint8Array], { type: 'text/plain' });
+      const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
+      
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -478,11 +483,10 @@ const App: React.FC = () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      addLog('info', '執行 TXT 格式修復轉檔', { fileName: file.name });
-      alert('轉檔完成！請使用下載的 FIXED_' + file.name + ' 匯入 ERP。');
+      addLog('info', '執行深度 TXT 格式修復', { fileName: file.name, lineCount: fixedLines.length });
+      alert(`轉檔完成！偵測到 ${fixedLines.length} 行資料，已校正為 ERP 專用格式。請使用下載的 FIXED_${file.name} 匯入。`);
     };
     reader.readAsText(file);
-    // Reset input
     e.target.value = '';
   };
 
