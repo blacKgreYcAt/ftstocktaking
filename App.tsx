@@ -392,7 +392,7 @@ const App: React.FC = () => {
         return `${col1}${col2}${col3}${col4}${col5}${col6}`;
       });
 
-    const content = lines.join('\r\n') + '\r\n';
+    const content = lines.join('\r\n'); // Removed the trailing + '\r\n'
     
     // Use TextEncoder to ensure clean output without BOM
     const encoder = new TextEncoder();
@@ -464,7 +464,7 @@ const App: React.FC = () => {
         return l.padEnd(145, ' ').slice(0, 145);
       });
 
-      const repaired = fixedLines.join('\r\n') + '\r\n';
+      const repaired = fixedLines.join('\r\n'); // Removed the trailing + '\r\n'
 
       const encoder = new TextEncoder();
       const uint8Array = encoder.encode(repaired);
