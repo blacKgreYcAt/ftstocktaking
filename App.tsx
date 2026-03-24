@@ -6,9 +6,13 @@ import {
   Link, Info, Package, ClipboardCheck, AlertCircle, PlusCircle, MapPin, Clock, User,
   Pause, Play, LogOut, Edit3, Hash, CloudSync, CloudCheck, CloudOff, Menu,
   RefreshCw, AlertTriangle, Terminal, Bug,
-  Sun, Moon, BookOpen, ChevronRight
+  Sun, Moon, BookOpen, ChevronRight, LayoutDashboard, TrendingUp, TrendingDown, DollarSign, BarChart3
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { 
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid 
+} from 'recharts';
 import { InventoryItem, LogEntry } from './types';
 import { audioService } from './services/audioService';
 
@@ -77,6 +81,7 @@ const App: React.FC = () => {
   const [timeFormat, setTimeFormat] = useState<TimeFormat>('date');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   // Refs to avoid stale closures
   const dataRef = useRef(data);
@@ -627,6 +632,9 @@ const App: React.FC = () => {
                 <button onClick={() => setShowGuideModal(true)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${isDarkMode ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'}`}>
                   <BookOpen size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" /> 教學
                 </button>
+                <button onClick={() => setShowDashboard(true)} className={`h-full flex items-center gap-1.5 px-3 md:px-6 lg:px-8 xl:px-10 rounded-md md:rounded-lg transition-all font-black text-[10px] md:text-sm lg:text-base xl:text-lg border ${isDarkMode ? 'bg-blue-600/20 border-blue-500/30 text-blue-400 hover:bg-blue-600/30' : 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100'}`}>
+                  <LayoutDashboard size={14} className="md:w-5 md:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" /> 數據
+                </button>
               </div>
             </div>
 
@@ -916,6 +924,128 @@ const App: React.FC = () => {
             </div>
             <div className={`p-8 md:p-14 border-t shrink-0 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
               <button onClick={() => setShowGuideModal(false)} className="w-full py-6 md:py-10 bg-emerald-600 text-white rounded-3xl text-2xl md:text-4xl font-black hover:bg-emerald-700 transition-all shadow-xl">我了解了，開始作業</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 盤點數據儀表板 Modal */}
+      {showDashboard && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[300] flex items-center justify-center p-4">
+          <div className={`w-full max-w-7xl rounded-[2rem] md:rounded-[4rem] overflow-hidden shadow-2xl border-4 max-h-[92vh] flex flex-col ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+            <div className="p-6 md:p-10 bg-blue-600 text-white flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-6">
+                <LayoutDashboard size={40} className="md:w-16 md:h-16" />
+                <h3 className="text-2xl md:text-5xl font-black italic">盤點進度儀表板</h3>
+              </div>
+              <button onClick={() => setShowDashboard(false)} className="p-3 hover:bg-white/20 rounded-full transition-colors"><X size={40} className="md:w-12 md:h-12" /></button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 md:p-12 space-y-8 md:space-y-12 custom-scrollbar">
+              {/* 核心指標 */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+                {[
+                  { label: "總盤點進度", value: `${Math.round((data.filter(i => i.actualQty > 0).length / (data.length || 1)) * 100)}%`, icon: TrendingUp, color: "text-blue-500" },
+                  { label: "庫存準確率", value: `${Math.round((data.filter(i => i.diff === 0 && i.actualQty > 0).length / (data.filter(i => i.actualQty > 0).length || 1)) * 100)}%`, icon: CheckCircle2, color: "text-emerald-500" },
+                  { label: "總差異件數", value: data.reduce((acc, i) => acc + Math.abs(i.diff), 0), icon: AlertTriangle, color: "text-red-500" },
+                  { label: "預估總價值", value: `$${Math.round(data.reduce((acc, i) => acc + (i.actualQty * (i.price || 0)), 0)).toLocaleString()}`, icon: DollarSign, color: "text-amber-500" }
+                ].map((stat, idx) => (
+                  <div key={idx} className={`p-6 md:p-10 rounded-3xl border-2 flex flex-col items-center justify-center text-center ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+                    <stat.icon size={32} className={`mb-4 ${stat.color}`} />
+                    <span className={`text-sm md:text-xl font-bold uppercase tracking-widest mb-2 ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}>{stat.label}</span>
+                    <span className={`text-2xl md:text-5xl font-black ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{stat.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* 圖表區 */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+                {/* 進度圓餅圖 */}
+                <div className={`p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border-2 h-[400px] md:h-[500px] flex flex-col ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+                  <h4 className="text-xl md:text-3xl font-black mb-8 flex items-center gap-3"><BarChart3 className="text-blue-500" /> 盤點狀態分佈</h4>
+                  <div className="flex-1">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: '已盤點', value: data.filter(i => i.actualQty > 0).length },
+                            { name: '未盤點', value: data.filter(i => i.actualQty === 0 && i.bookQty > 0).length },
+                            { name: '新增項', value: data.filter(i => i.bookQty === 0 && i.actualQty > 0).length }
+                          ]}
+                          cx="50%" cy="50%"
+                          innerRadius={60} outerRadius={120}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          <Cell fill="#3b82f6" />
+                          <Cell fill="#64748b" />
+                          <Cell fill="#f59e0b" />
+                        </Pie>
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: isDarkMode ? '#0f172a' : '#fff', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
+                          itemStyle={{ color: isDarkMode ? '#fff' : '#000' }}
+                        />
+                        <Legend verticalAlign="bottom" height={36} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* 差異最大的商品 */}
+                <div className={`p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border-2 h-[400px] md:h-[500px] flex flex-col ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+                  <h4 className="text-xl md:text-3xl font-black mb-8 flex items-center gap-3"><TrendingDown className="text-red-500" /> 庫存差異排行 (Top 5)</h4>
+                  <div className="flex-1">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={data
+                          .filter(i => i.diff !== 0)
+                          .sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff))
+                          .slice(0, 5)
+                          .map(i => ({ name: i.productCode, diff: i.diff }))
+                        }
+                        layout="vertical"
+                        margin={{ left: 20, right: 30 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#1e293b' : '#e2e8f0'} />
+                        <XAxis type="number" stroke={isDarkMode ? '#64748b' : '#94a3b8'} />
+                        <YAxis dataKey="name" type="category" width={100} stroke={isDarkMode ? '#64748b' : '#94a3b8'} />
+                        <Tooltip 
+                          cursor={{ fill: isDarkMode ? '#1e293b' : '#f1f5f9' }}
+                          contentStyle={{ backgroundColor: isDarkMode ? '#0f172a' : '#fff', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
+                        />
+                        <Bar dataKey="diff" radius={[0, 10, 10, 0]}>
+                          {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.diff > 0 ? '#10b981' : '#ef4444'} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+              {/* 異常清單摘要 */}
+              <div className={`p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border-2 ${isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200 shadow-sm'}`}>
+                <h4 className="text-xl md:text-3xl font-black mb-8 flex items-center gap-3"><AlertCircle className="text-amber-500" /> 異常項目摘要</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-slate-500 uppercase mb-2">盤盈項目</span>
+                    <span className="text-2xl font-black text-emerald-500">{data.filter(i => i.diff > 0).length} 項</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-slate-500 uppercase mb-2">盤虧項目</span>
+                    <span className="text-2xl font-black text-red-500">{data.filter(i => i.diff < 0).length} 項</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-slate-500 uppercase mb-2">未盤點總數</span>
+                    <span className="text-2xl font-black text-slate-500">{data.filter(i => i.actualQty === 0 && i.bookQty > 0).length} 項</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className={`p-8 md:p-14 border-t shrink-0 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+              <button onClick={() => setShowDashboard(false)} className="w-full py-6 md:py-10 bg-blue-600 text-white rounded-3xl text-2xl md:text-4xl font-black hover:bg-blue-700 transition-all shadow-xl">返回作業</button>
             </div>
           </div>
         </div>
