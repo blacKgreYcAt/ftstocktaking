@@ -23,13 +23,16 @@ const LOGS_KEY = 'dafeng_inventory_logs_v1';
 type TimeFormat = 'off' | 'datetime' | 'date';
 type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
 
-const APP_VERSION = "v1.2.5";
+const APP_VERSION = "v1.3.0";
 const UPDATE_NOTES = [
+  "新增 F2 查詢功能，可即時查核條碼已盤點數量並進行修正。",
+  "新增深色/淺色/經典模式切換，適配不同作業環境與實體機台視覺。",
   "優化 RWD 響應式佈局，適配筆記型電腦與行動裝置。",
   "強化淺色模式（白色背景）下的視覺對比度與易讀性。",
   "新增軟體更新說明與使用教學功能。",
   "優化掃描邏輯與語音提示，提升作業效率。",
-  "修正部分已知介面顯示問題。"
+  "修正暫停模式下的點擊誤觸問題，強化安全性。",
+  "全面提升介面文字大小，優化長輩與老花使用者閱讀體驗。"
 ];
 
 const GUIDE_STEPS = [
@@ -52,6 +55,10 @@ const GUIDE_STEPS = [
   {
     title: "步驟 5：檢視與匯出",
     content: "作業中可點擊底部「未盤項」查看尚未清點的貨品。完成後點擊「結束」按鈕，系統將產生包含所有盤點數據的 Excel 報表供下載。"
+  },
+  {
+    title: "步驟 6：查詢與模式切換",
+    content: "按下 F2 鍵或點擊「查詢」可即時查核條碼已盤點數量並修正。在「設定」中可切換深色/淺色模式，或開啟「經典模式」以模擬實體盤點機介面。淺色模式適合光線充足環境，深色模式可減輕眼睛疲勞，經典模式則提供最直覺的傳統盤點體驗。"
   }
 ];
 
@@ -87,6 +94,10 @@ const App: React.FC = () => {
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showQueryModal, setShowQueryModal] = useState(false);
+  const [queryInputValue, setQueryInputValue] = useState('');
+  const [queryResult, setQueryResult] = useState<InventoryItem | null>(null);
+  const [queryEditQty, setQueryEditQty] = useState('');
   const [pauseInput, setPauseInput] = useState('');
 
   // Refs to avoid stale closures
@@ -229,6 +240,17 @@ const App: React.FC = () => {
   }, [isPaused, data, backupToCloud]);
 
   useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'F2') {
+        e.preventDefault();
+        setShowQueryModal(true);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
+  useEffect(() => {
     if (!isPaused) {
       setPauseInput('');
       return;
@@ -262,12 +284,12 @@ const App: React.FC = () => {
         <div className="w-full max-w-md border-4 border-black bg-white shadow-2xl flex flex-col h-[90vh]">
           {/* Header */}
           <div className="flex justify-between items-center px-4 py-2 border-b-2 border-black bg-white">
-            <span className="text-2xl font-bold">盤點作業－比對</span>
-            <span className="text-2xl font-bold bg-black text-white px-2">累加</span>
+            <span className="text-3xl font-bold">盤點作業－比對</span>
+            <span className="text-3xl font-bold bg-black text-white px-2">累加</span>
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 p-6 space-y-4 text-3xl">
+          <div className="flex-1 p-6 space-y-4 text-4xl">
             <div className="flex">
               <span className="w-24">日期</span>
               <span className="flex-1 text-red-600">[{yyyymmdd}]</span>
@@ -305,28 +327,35 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-12 space-y-2">
-              <p>本次輸入量：{scanQty}</p>
-              <p>本商品數量：<span className="text-blue-700">{lastScanned?.actualQty || 0}</span></p>
-              <p>本日本倉總數：<span className="text-blue-700">{totalActual}</span></p>
+            <div className="pt-16 space-y-4 text-4xl">
+              <p>本次輸入量：{scanQty} 件</p>
+              <p>本商品數量：<span className="text-blue-700">{lastScanned?.actualQty || 0} 件</span></p>
+              <p>本日本倉總數：<span className="text-blue-700">{totalActual} 件</span></p>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="bg-white text-black flex justify-between px-2 py-3 text-2xl border-t-2 border-black">
+          <div className="bg-white text-black flex justify-between px-2 py-4 text-4xl border-t-2 border-black">
             <button 
-              onClick={togglePause}
+              onClick={(e) => { e.stopPropagation(); togglePause(); }}
               className="flex items-center gap-1 hover:bg-gray-100 px-1 rounded transition-colors active:scale-95"
             >
               <span className="bg-black text-white px-1 font-bold">M2</span>
-              <span className="text-red-600">MODE</span>
+              <span className="text-red-600">模式</span>
+            </button>
+            <button 
+              onClick={(e) => { e.stopPropagation(); setShowQueryModal(true); }}
+              className="flex items-center gap-1 hover:bg-gray-100 px-1 rounded transition-colors active:scale-95"
+            >
+              <span className="bg-black text-white px-1 font-bold">F2</span>
+              <span className="text-red-600">查詢</span>
             </button>
             <button 
               onClick={() => setShowSettings(true)}
               className="flex items-center gap-1 hover:bg-gray-100 px-1 rounded transition-colors active:scale-95"
             >
               <span className="bg-black text-white px-1 font-bold">F1</span>
-              <span className="text-red-600">主選單</span>
+              <span className="text-red-600">選單</span>
             </button>
             <button 
               onClick={() => setIsClassicMode(false)}
@@ -349,7 +378,7 @@ const App: React.FC = () => {
               </div>
             </div>
             
-            <span className="italic font-black text-2xl tracking-widest text-black">DENSO</span>
+            <span className="italic font-black text-3xl tracking-widest text-black">DENSO</span>
             <div className="w-10" /> {/* Spacer */}
           </div>
         </div>
@@ -447,6 +476,38 @@ const App: React.FC = () => {
     e.preventDefault();
     processBarcode(inputValue);
     setInputValue('');
+  };
+
+  const handleQuerySearch = (barcode: string) => {
+    const found = data.find(item => 
+      item.barcode === barcode || item.productCode === barcode || item.mappedBarcodes?.includes(barcode)
+    );
+    if (found) {
+      setQueryResult(found);
+      setQueryEditQty(found.actualQty.toString());
+      audioService.speakSuccess('', 0);
+    } else {
+      setQueryResult(null);
+      audioService.speakError();
+    }
+  };
+
+  const handleSaveQueryEdit = () => {
+    if (!queryResult) return;
+    const newQty = parseFloat(queryEditQty);
+    if (isNaN(newQty)) return;
+
+    const updatedData = data.map(item => {
+      if (item.productCode === queryResult.productCode) {
+        return { ...item, actualQty: newQty, diff: newQty - item.bookQty };
+      }
+      return item;
+    });
+    setData(updatedData);
+    setShowQueryModal(false);
+    setQueryInputValue('');
+    setQueryResult(null);
+    audioService.speakMappingSuccess();
   };
 
   const manualSetTotalQty = () => {
@@ -625,34 +686,34 @@ const App: React.FC = () => {
       
       {isPaused ? (
         <div 
-          onClick={togglePause}
-          className={`fixed inset-0 z-[200] backdrop-blur-xl flex flex-col items-center justify-center cursor-pointer animate-in fade-in duration-500 ${isDarkMode ? 'bg-black/40' : 'bg-white/40'}`}
+          onClick={(e) => e.stopPropagation()}
+          className={`fixed inset-0 z-[200] backdrop-blur-xl flex flex-col items-center justify-center animate-in fade-in duration-500 cursor-default ${isDarkMode ? 'bg-black/40' : 'bg-white/40'}`}
         >
           <div 
-            className="bg-amber-500 p-10 rounded-full shadow-2xl hover:scale-105 transition-transform mb-8 group"
+            className="bg-amber-500 p-12 rounded-full shadow-2xl mb-10 animate-pulse"
           >
-            <Play size={56} className="text-white" fill="currentColor" />
+            <Play size={72} className="text-white" fill="currentColor" />
           </div>
           
-          <div className="text-center space-y-4">
-            <h2 className="text-5xl font-bold tracking-tight">盤點已暫停</h2>
-            <div className="space-y-2 opacity-70">
-              <p className="text-xl font-medium">點擊任何地方繼續作業</p>
-              <p className="text-lg text-amber-500 font-bold">提示：請輸入 4 個 0 (0000) 回到主畫面</p>
+          <div className="text-center space-y-6">
+            <h2 className="text-7xl font-bold tracking-tight">盤點已暫停</h2>
+            <div className="space-y-4">
+              <p className="text-3xl text-amber-500 font-bold">請輸入 4 個 0 (0000) 回到主畫面</p>
+              <p className="text-xl opacity-50 font-medium">(滑鼠點擊已停用，請使用鍵盤輸入)</p>
             </div>
           </div>
 
-          <div className="mt-12 flex gap-4">
+          <div className="mt-16 flex gap-6">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleExportMachineFormat();
               }}
-              className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg hover:scale-105 active:scale-95 ${
+              className={`flex items-center gap-4 px-10 py-5 rounded-2xl font-bold text-2xl transition-all shadow-lg hover:scale-105 active:scale-95 ${
                 isDarkMode ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white hover:bg-gray-50 text-slate-900'
               }`}
             >
-              <FileText size={24} className="text-amber-500" />
+              <FileText size={32} className="text-amber-500" />
               匯出目前 TXT 檔
             </button>
           </div>
@@ -669,12 +730,12 @@ const App: React.FC = () => {
             <Package size={16} />
           </div>
           <div className="flex flex-col leading-tight mr-6">
-            <h1 className="text-[13px] font-bold">大豐資訊盤點</h1>
-            <p className="text-[10px] opacity-50 font-medium">系統版本 {APP_VERSION}</p>
+            <h1 className="text-[15px] font-bold">大豐資訊盤點</h1>
+            <p className="text-[12px] opacity-50 font-medium">系統版本 {APP_VERSION}</p>
           </div>
 
           <div className="flex items-center gap-0.5">
-            <label className={`h-8 flex items-center gap-2 px-3 rounded-md cursor-pointer text-[14px] font-medium transition-colors ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
+            <label className={`h-8 flex items-center gap-2 px-3 rounded-md cursor-pointer text-[16px] font-medium transition-colors ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
               <FileSpreadsheet size={15} /> 匯入資料
               <input type="file" accept=".csv, .xlsx" onChange={(e) => {
                  const file = e.target.files?.[0]; if (!file) return;
@@ -702,25 +763,29 @@ const App: React.FC = () => {
                }} className="hidden" />
             </label>
 
-            <button onClick={() => setShowSettings(true)} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[14px] font-medium ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
+            <button onClick={() => setShowQueryModal(true)} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[16px] font-medium ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
+              <Search size={15} /> 查詢
+            </button>
+
+            <button onClick={() => setShowSettings(true)} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[16px] font-medium ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
               <Settings size={15} /> 設定
             </button>
 
-            <button onClick={() => setShowGuideModal(true)} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[14px] font-medium ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
+            <button onClick={() => setShowGuideModal(true)} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[16px] font-medium ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
               <BookOpen size={15} /> 使用教學
             </button>
 
-            <button onClick={() => { setUnknownBarcode(''); setNewProductName(''); setNewProductCode(''); setIsCreatingNew(true); setShowMappingModal(true); }} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[14px] font-medium ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
+            <button onClick={() => { setUnknownBarcode(''); setNewProductName(''); setNewProductCode(''); setIsCreatingNew(true); setShowMappingModal(true); }} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[16px] font-medium ${isDarkMode ? 'hover:bg-white/10 text-slate-300' : 'hover:bg-black/5 text-slate-700'}`}>
               <PlusCircle size={15} /> 新增商品
             </button>
 
             <div className={`w-px h-4 mx-2 ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`} />
 
-            <button onClick={handleEndJob} disabled={data.length === 0} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[14px] font-medium text-red-500 hover:bg-red-500/10 disabled:opacity-30`}>
+            <button onClick={handleEndJob} disabled={data.length === 0} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[16px] font-medium text-red-500 hover:bg-red-500/10 disabled:opacity-30`}>
               <LogOut size={15} /> 結束作業
             </button>
 
-            <button onClick={handleExportMachineFormat} disabled={data.length === 0} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[14px] font-medium text-blue-500 hover:bg-blue-500/10 disabled:opacity-30`}>
+            <button onClick={handleExportMachineFormat} disabled={data.length === 0} className={`h-8 flex items-center gap-2 px-3 rounded-md transition-colors text-[16px] font-medium text-blue-500 hover:bg-blue-500/10 disabled:opacity-30`}>
               <FileDown size={15} /> 匯出 TXT
             </button>
           </div>
@@ -729,7 +794,7 @@ const App: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${syncStatus === 'syncing' ? 'bg-blue-500 animate-pulse' : syncStatus === 'error' ? 'bg-red-500' : 'bg-emerald-500'}`} />
-            <span className="text-[11px] font-medium opacity-50 uppercase tracking-wider">{syncStatus === 'syncing' ? 'Syncing' : 'Ready'}</span>
+            <span className="text-[13px] font-medium opacity-50 tracking-wider">{syncStatus === 'syncing' ? '同步中' : '就緒'}</span>
           </div>
           <button onClick={togglePause} className={`p-2 rounded-md transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}>
             {isPaused ? <Play size={16} /> : <Pause size={16} />}
@@ -738,30 +803,30 @@ const App: React.FC = () => {
       </header>
             <main className="flex-1 overflow-hidden flex flex-col p-6 gap-6">
         {/* macOS Dashboard Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 shrink-0">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 shrink-0">
           {[
-            { label: '累計數量', value: totalActual, icon: <Hash size={15} />, color: 'text-blue-500' },
-            { label: '庫存差異', value: totalDiff, icon: <Diff size={15} />, color: totalDiff === 0 ? 'text-slate-500' : totalDiff > 0 ? 'text-emerald-500' : 'text-red-500' },
-            { label: '總項數', value: data.length, icon: <Layers size={15} />, color: 'text-slate-500' },
-            { label: '已完成', value: data.filter(i => i.actualQty > 0).length, icon: <CheckCircle2 size={15} />, color: 'text-emerald-500' },
-            { label: '未盤項', value: data.filter(i => i.actualQty === 0 && i.bookQty > 0).length, icon: <Circle size={15} />, color: 'text-amber-500' },
+            { label: '累計數量', value: `${totalActual} 件`, icon: <Hash size={20} />, color: 'text-blue-500' },
+            { label: '庫存差異', value: `${totalDiff} 件`, icon: <Diff size={20} />, color: totalDiff === 0 ? 'text-slate-500' : totalDiff > 0 ? 'text-emerald-500' : 'text-red-500' },
+            { label: '總項數', value: `${data.length} 項`, icon: <Layers size={20} />, color: 'text-slate-500' },
+            { label: '已完成', value: `${data.filter(i => i.actualQty > 0).length} 項`, icon: <CheckCircle2 size={20} />, color: 'text-emerald-500' },
+            { label: '未盤項', value: `${data.filter(i => i.actualQty === 0 && i.bookQty > 0).length} 項`, icon: <Circle size={20} />, color: 'text-amber-500' },
           ].map((card, i) => (
-            <div key={i} className={`p-4 rounded-xl shadow-sm border flex flex-col gap-1 transition-all hover:shadow-md ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
-              <div className="flex items-center gap-2 opacity-40 text-[12px] font-bold uppercase tracking-wider">
+            <div key={i} className={`p-6 rounded-2xl shadow-sm border flex flex-col gap-2 transition-all hover:shadow-md ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
+              <div className="flex items-center gap-2 opacity-50 text-[18px] font-bold uppercase tracking-wider">
                 {card.icon} {card.label}
               </div>
-              <div className={`text-[24px] font-bold tracking-tight ${card.color}`}>
-                {card.value.toLocaleString()}
+              <div className={`text-[36px] font-bold tracking-tight ${card.color}`}>
+                {card.value}
               </div>
             </div>
           ))}
         </div>
 
         {/* macOS Search-style Input Bar */}
-        <div className="flex flex-col items-center gap-4 shrink-0">
-          <form onSubmit={handleScan} className={`flex items-center w-full max-w-2xl h-14 rounded-xl border shadow-sm overflow-hidden transition-all focus-within:ring-2 focus-within:ring-blue-500/50 ${isDarkMode ? 'bg-[#2D2D2D] border-white/10' : 'bg-white border-black/10'}`}>
-            <div className={`flex items-center gap-2 px-5 border-r h-full ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-black/5 bg-black/5'}`}>
-              <span className="text-[13px] font-bold opacity-40 uppercase">Qty</span>
+        <div className="flex flex-col items-center gap-6 shrink-0">
+          <form onSubmit={handleScan} className={`flex items-center w-full max-w-3xl h-20 rounded-2xl border shadow-sm overflow-hidden transition-all focus-within:ring-2 focus-within:ring-blue-500/50 ${isDarkMode ? 'bg-[#2D2D2D] border-white/10' : 'bg-white border-black/10'}`}>
+            <div className={`flex items-center gap-3 px-6 border-r h-full ${isDarkMode ? 'border-white/10 bg-white/5' : 'border-black/5 bg-black/5'}`}>
+              <span className="text-[22px] font-bold opacity-40">數量</span>
               <input
                 ref={qtyRef}
                 type="text"
@@ -773,12 +838,12 @@ const App: React.FC = () => {
                     inputRef.current?.focus(); 
                   }
                 }}
-                className="w-14 bg-transparent text-center font-bold text-[20px] outline-none"
+                className="w-20 bg-transparent text-center font-bold text-[36px] outline-none"
                 placeholder="1"
               />
             </div>
-            <div className="flex-1 flex items-center px-5 gap-3">
-              <Search size={20} className="opacity-30 text-blue-500" />
+            <div className="flex-1 flex items-center px-6 gap-4">
+              <Search size={32} className="opacity-30 text-blue-500" />
               <input
                 ref={inputRef}
                 type="text"
@@ -786,72 +851,72 @@ const App: React.FC = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={isPaused ? "暫停中..." : "掃描條碼或輸入編號..."}
                 disabled={data.length === 0 || isPaused}
-                className="flex-1 bg-transparent outline-none text-[17px] font-medium placeholder:opacity-30"
+                className="flex-1 bg-transparent outline-none text-[32px] font-medium placeholder:opacity-30"
                 autoComplete="off"
               />
             </div>
-            <button type="submit" className="h-full px-8 bg-blue-500 text-white font-bold text-[15px] hover:bg-blue-600 transition-colors">
+            <button type="submit" className="h-full px-12 bg-blue-500 text-white font-bold text-[28px] hover:bg-blue-600 transition-colors">
               確認
             </button>
           </form>
 
           {/* 最後掃描商品資訊 (Product Info Area) */}
-          <div className={`w-full max-w-2xl p-6 rounded-xl border shadow-sm flex items-center gap-6 transition-all duration-300 ${lastScanned ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'} ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
-            <div className="flex-1 grid grid-cols-2 gap-x-8 gap-y-3">
-              <div className="col-span-2 mb-1">
-                <span className="text-[12px] font-bold opacity-40 uppercase tracking-wider block mb-0.5">最後掃描商品</span>
-                <h2 className="text-[20px] font-bold truncate">{lastScanned?.name || '未命名商品'}</h2>
+          <div className={`w-full max-w-3xl p-8 rounded-2xl border shadow-sm flex items-center gap-8 transition-all duration-300 ${lastScanned ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'} ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
+            <div className="flex-1 grid grid-cols-2 gap-x-10 gap-y-4">
+              <div className="col-span-2 mb-2">
+                <span className="text-[22px] font-bold opacity-40 uppercase tracking-wider block mb-1">最後掃描商品</span>
+                <h2 className="text-[36px] font-bold truncate">{lastScanned?.name || '未命名商品'}</h2>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-bold opacity-40 uppercase tracking-wider">款式代號</span>
-                <span className="text-[15px] font-medium">{lastScanned?.productCode || '-'}</span>
+                <span className="text-[20px] font-bold opacity-40 uppercase tracking-wider">款式代號</span>
+                <span className="text-[24px] font-medium">{lastScanned?.productCode || '-'}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-bold opacity-40 uppercase tracking-wider">國際條碼</span>
-                <span className="text-[15px] font-medium">{lastScanned?.barcode || '-'}</span>
+                <span className="text-[20px] font-bold opacity-40 uppercase tracking-wider">國際條碼</span>
+                <span className="text-[24px] font-medium">{lastScanned?.barcode || '-'}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-bold opacity-40 uppercase tracking-wider">顏色 / 尺寸</span>
-                <span className="text-[15px] font-medium">{lastScanned?.color || '-'} / {lastScanned?.size || '-'}</span>
+                <span className="text-[20px] font-bold opacity-40 uppercase tracking-wider">顏色 / 尺寸</span>
+                <span className="text-[24px] font-medium">{lastScanned?.color || '-'} / {lastScanned?.size || '-'}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-[12px] font-bold opacity-40 uppercase tracking-wider">含稅定價</span>
-                <span className="text-[15px] font-bold text-blue-500">${lastScanned?.price?.toLocaleString() || '0'}</span>
+                <span className="text-[20px] font-bold opacity-40 uppercase tracking-wider">含稅定價</span>
+                <span className="text-[24px] font-bold text-blue-500">${lastScanned?.price?.toLocaleString() || '0'}</span>
               </div>
             </div>
-            <div className="shrink-0 flex flex-col items-center justify-center p-5 bg-blue-500/10 rounded-lg border border-blue-500/20 min-w-[100px]">
-              <span className="text-[12px] font-bold text-blue-500 uppercase tracking-wider mb-1">實盤數量</span>
-              <span className="text-4xl font-bold text-blue-500">{lastScanned?.actualQty || 0}</span>
+            <div className="shrink-0 flex flex-col items-center justify-center p-6 bg-blue-500/10 rounded-xl border border-blue-500/20 min-w-[150px]">
+              <span className="text-[20px] font-bold text-blue-500 uppercase tracking-wider mb-1">實盤數量</span>
+              <span className="text-7xl font-bold text-blue-500">{lastScanned?.actualQty || 0}</span>
             </div>
           </div>
         </div>
 
         {/* Real-time Data Table Area */}
         <div className={`flex-1 rounded-2xl border shadow-sm overflow-hidden flex flex-col ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
-          <div className={`h-12 px-6 flex items-center border-b text-[13px] font-bold uppercase tracking-wider opacity-50 ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
-            <div className="w-16">序號</div>
+          <div className={`h-16 px-8 flex items-center border-b text-[22px] font-bold uppercase tracking-wider opacity-50 ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
+            <div className="w-24">序號</div>
             <div className="flex-1">條碼 / 商品名稱</div>
-            <div className="w-24 text-center">實盤</div>
-            <div className="w-24 text-center">帳面</div>
-            <div className="w-24 text-center">差異</div>
-            <div className="w-24 text-right">狀態</div>
+            <div className="w-32 text-center">實盤</div>
+            <div className="w-32 text-center">帳面</div>
+            <div className="w-32 text-center">差異</div>
+            <div className="w-32 text-right">狀態</div>
           </div>
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {data.filter(i => i.actualQty > 0 || i.barcode === lastScanned?.barcode).sort((a, b) => (b.scanTime || 0) - (a.scanTime || 0)).map((item, idx) => (
-              <div key={item.barcode} className={`px-6 py-5 flex items-center border-b last:border-0 transition-colors hover:bg-black/5 ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
-                <div className="w-16 text-[14px] opacity-40 font-mono">{data.length - idx}</div>
-                <div className="flex-1 flex flex-col gap-0.5">
-                  <div className="text-[16px] font-bold tracking-tight">{item.barcode}</div>
-                  <div className="text-[14px] opacity-50 font-medium truncate max-w-md">{item.name || '未命名商品'}</div>
+              <div key={item.barcode} className={`px-8 py-8 flex items-center border-b last:border-0 transition-colors hover:bg-black/5 ${isDarkMode ? 'border-white/5' : 'border-black/5'}`}>
+                <div className="w-24 text-[22px] opacity-40 font-mono">{data.length - idx}</div>
+                <div className="flex-1 flex flex-col gap-1">
+                  <div className="text-[28px] font-bold tracking-tight">{item.barcode}</div>
+                  <div className="text-[24px] opacity-50 font-medium truncate max-w-md">{item.name || '未命名商品'}</div>
                 </div>
-                <div className="w-24 text-center text-[18px] font-bold text-blue-500">{item.actualQty}</div>
-                <div className="w-24 text-center text-[15px] opacity-50">{item.bookQty}</div>
-                <div className={`w-24 text-center text-[15px] font-bold ${item.diff === 0 ? 'opacity-30' : item.diff > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                <div className="w-32 text-center text-[32px] font-bold text-blue-500">{item.actualQty}</div>
+                <div className="w-32 text-center text-[26px] opacity-50">{item.bookQty}</div>
+                <div className={`w-32 text-center text-[26px] font-bold ${item.diff === 0 ? 'opacity-30' : item.diff > 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                   {item.diff > 0 ? `+${item.diff}` : item.diff}
                 </div>
-                <div className="w-24 text-right">
-                  <span className={`text-[12px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter ${item.diff === 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
-                    {item.diff === 0 ? 'Match' : 'Diff'}
+                <div className="w-32 text-right">
+                  <span className={`text-[22px] font-bold px-6 py-2 rounded-full tracking-tighter ${item.diff === 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                    {item.diff === 0 ? '相符' : '差異'}
                   </span>
                 </div>
               </div>
@@ -870,52 +935,52 @@ const App: React.FC = () => {
       {showUnscannedList && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
           <div className={`rounded-2xl w-full max-w-xl max-h-[80vh] flex flex-col shadow-2xl border overflow-hidden ${isDarkMode ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-[#F2F2F7] border-black/10 text-slate-900'}`}>
-            <div className={`p-5 border-b flex justify-between items-center shrink-0 ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
+            <div className={`p-6 border-b flex justify-between items-center shrink-0 ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
               <div className="flex items-center gap-3">
-                <AlertTriangle size={20} className="text-amber-500" />
-                <h3 className="text-[17px] font-bold">未清點項目清單</h3>
+                <AlertTriangle size={24} className="text-amber-500" />
+                <h3 className="text-[24px] font-bold">未清點項目清單</h3>
               </div>
               <button 
                 onClick={() => setShowUnscannedList(false)}
                 className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
               >
-                <X size={20} className="opacity-60" />
+                <X size={24} className="opacity-60" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-4">
+            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-4">
               {data.filter(i => i.bookQty > 0 && i.actualQty === 0).length === 0 ? (
                 <div className="text-center py-20 opacity-40">
-                  <CheckCircle2 size={56} className="mx-auto mb-4 text-emerald-500/50" />
-                  <p className="text-[15px] font-medium">所有應盤項目皆已清點！</p>
+                  <CheckCircle2 size={64} className="mx-auto mb-4 text-emerald-500/50" />
+                  <p className="text-[22px] font-medium">所有應盤項目皆已清點！</p>
                 </div>
               ) : (
                 data.filter(i => i.bookQty > 0 && i.actualQty === 0).map((item, idx) => (
-                  <div key={idx} className={`p-5 rounded-xl border transition-all ${isDarkMode ? 'bg-[#2D2D2D] border-white/5 hover:border-white/20' : 'bg-white border-black/5 hover:border-black/10 shadow-sm'}`}>
+                  <div key={idx} className={`p-6 rounded-xl border transition-all ${isDarkMode ? 'bg-[#2D2D2D] border-white/5 hover:border-white/20' : 'bg-white border-black/5 hover:border-black/10 shadow-sm'}`}>
                     <div className="flex justify-between items-start gap-4">
                       <div className="min-w-0 flex-1">
-                        <p className="text-[16px] font-bold truncate mb-1">{item.name}</p>
-                        <p className="text-[13px] font-mono opacity-50 truncate">{item.productCode} • {item.barcode}</p>
+                        <p className="text-[22px] font-bold truncate mb-1">{item.name}</p>
+                        <p className="text-[18px] font-mono opacity-50 truncate">{item.productCode} • {item.barcode}</p>
                         <div className="flex gap-2 mt-3">
-                          {item.color && <span className={`text-[12px] px-3 py-1 rounded-md font-medium ${isDarkMode ? 'bg-white/5 text-white/60' : 'bg-black/5 text-black/60'}`}>{item.color}</span>}
-                          {item.size && <span className={`text-[12px] px-3 py-1 rounded-md font-medium ${isDarkMode ? 'bg-white/5 text-white/60' : 'bg-black/5 text-black/60'}`}>{item.size}</span>}
+                          {item.color && <span className={`text-[17px] px-4 py-1.5 rounded-md font-medium ${isDarkMode ? 'bg-white/5 text-white/60' : 'bg-black/5 text-black/60'}`}>{item.color}</span>}
+                          {item.size && <span className={`text-[17px] px-4 py-1.5 rounded-md font-medium ${isDarkMode ? 'bg-white/5 text-white/60' : 'bg-black/5 text-black/60'}`}>{item.size}</span>}
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-[12px] font-bold uppercase tracking-wider opacity-40 mb-1">應有</p>
-                        <p className="text-[22px] font-bold text-amber-500">{item.bookQty}</p>
+                        <p className="text-[17px] font-bold uppercase tracking-wider opacity-40 mb-1">應有</p>
+                        <p className="text-[32px] font-bold text-amber-500">{item.bookQty}</p>
                       </div>
                     </div>
                   </div>
                 ))
               )}
             </div>
-            <div className={`p-5 border-t flex justify-between items-center shrink-0 ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
-              <p className="text-[12px] font-medium opacity-50">
+            <div className={`p-6 border-t flex justify-between items-center shrink-0 ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
+              <p className="text-[18px] font-medium opacity-50">
                 共 {data.filter(i => i.bookQty > 0 && i.actualQty === 0).length} 項未清點
               </p>
               <button 
                 onClick={() => setShowUnscannedList(false)}
-                className="px-6 py-2 rounded-lg bg-blue-500 text-white font-bold text-[13px] hover:bg-blue-600 transition-all shadow-sm"
+                className="px-8 py-3 rounded-lg bg-blue-500 text-white font-bold text-[20px] hover:bg-blue-600 transition-all shadow-sm"
               >
                 完成
               </button>
@@ -933,22 +998,22 @@ const App: React.FC = () => {
                 <Info size={32} className="text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">軟體更新說明</h3>
-                <p className="text-[13px] opacity-50 font-medium mt-1">目前版本：{APP_VERSION}</p>
+                <h3 className="text-2xl font-bold">軟體更新說明</h3>
+                <p className="text-[16px] opacity-50 font-medium mt-1">目前版本：{APP_VERSION}</p>
               </div>
             </div>
             <div className="p-8 space-y-4 overflow-y-auto max-h-[50vh] custom-scrollbar">
               {UPDATE_NOTES.map((note, idx) => (
                 <div key={idx} className="flex gap-4 items-start">
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 shrink-0" />
-                  <p className="text-[14px] font-medium leading-relaxed opacity-80">{note}</p>
+                  <p className="text-[18px] font-medium leading-relaxed opacity-80">{note}</p>
                 </div>
               ))}
             </div>
             <div className={`p-6 border-t flex justify-center ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
               <button 
                 onClick={() => setShowUpdateModal(false)}
-                className="px-12 py-2.5 rounded-lg bg-blue-500 text-white font-bold text-[14px] hover:bg-blue-600 transition-all shadow-sm"
+                className="px-12 py-2.5 rounded-lg bg-blue-500 text-white font-bold text-[18px] hover:bg-blue-600 transition-all shadow-sm"
               >
                 了解並關閉
               </button>
@@ -964,7 +1029,7 @@ const App: React.FC = () => {
             <div className={`p-6 flex justify-between items-center shrink-0 border-b ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
               <div className="flex items-center gap-3">
                 <BookOpen size={20} className="text-emerald-500" />
-                <h3 className="text-lg font-bold">使用教學指南</h3>
+                <h3 className="text-2xl font-bold">使用教學指南</h3>
               </div>
               <button onClick={() => setShowGuideModal(false)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}><X size={20} /></button>
             </div>
@@ -972,20 +1037,127 @@ const App: React.FC = () => {
               {GUIDE_STEPS.map((step, idx) => (
                 <div key={idx} className={`p-8 rounded-xl border transition-all ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5 shadow-sm'}`}>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-[16px] font-bold shadow-lg shadow-emerald-500/20">{idx + 1}</div>
-                    <h4 className="text-[18px] font-bold text-emerald-500">{step.title}</h4>
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-[20px] font-bold shadow-lg shadow-emerald-500/20">{idx + 1}</div>
+                    <h4 className="text-[22px] font-bold text-emerald-500">{step.title}</h4>
                   </div>
-                  <p className="text-[16px] font-medium leading-relaxed opacity-70">{step.content}</p>
+                  <p className="text-[20px] font-medium leading-relaxed opacity-70">{step.content}</p>
                 </div>
               ))}
             </div>
             <div className={`p-6 border-t flex justify-center shrink-0 ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
               <button 
                 onClick={() => setShowGuideModal(false)}
-                className="px-16 py-3.5 rounded-lg bg-emerald-500 text-white font-bold text-[16px] hover:bg-emerald-600 transition-all shadow-sm"
+                className="px-16 py-3.5 rounded-lg bg-emerald-500 text-white font-bold text-[20px] hover:bg-emerald-600 transition-all shadow-sm"
               >
                 我了解了，開始作業
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 查詢 Modal */}
+      {showQueryModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[400] flex items-center justify-center p-4">
+          <div className={`w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl border flex flex-col ${isDarkMode ? 'bg-[#1E1E1E] border-white/10 text-white' : 'bg-[#F2F2F7] border-black/10 text-slate-900'}`}>
+            <div className={`p-6 flex justify-between items-center shrink-0 border-b ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
+              <div className="flex items-center gap-3">
+                <Search size={24} className="text-blue-500" />
+                <h3 className="text-[20px] font-bold">商品盤點數量查詢</h3>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowQueryModal(false);
+                  setQueryInputValue('');
+                  setQueryResult(null);
+                }} 
+                className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-8 space-y-8">
+              <div className="space-y-2">
+                <label className="text-[16px] font-bold opacity-60 ml-1">請掃描或輸入條碼</label>
+                <div className="flex gap-2">
+                  <input 
+                    autoFocus
+                    type="text" 
+                    value={queryInputValue}
+                    onChange={(e) => setQueryInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleQuerySearch(queryInputValue);
+                        setQueryInputValue('');
+                      }
+                    }}
+                    className={`flex-1 px-4 py-4 rounded-xl border outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-[18px] ${isDarkMode ? 'bg-[#2D2D2D] border-white/10' : 'bg-white border-black/10'}`}
+                    placeholder="掃描條碼..."
+                  />
+                  <button 
+                    onClick={() => {
+                      handleQuerySearch(queryInputValue);
+                      setQueryInputValue('');
+                    }}
+                    className="px-8 py-4 bg-blue-500 text-white rounded-xl font-bold text-[17px] hover:bg-blue-600 transition-all"
+                  >
+                    查詢
+                  </button>
+                </div>
+              </div>
+
+              {queryResult ? (
+                <div className={`p-8 rounded-xl border space-y-6 ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5 shadow-sm'}`}>
+                  <div>
+                    <p className="text-[15px] opacity-50 font-bold uppercase tracking-wider">商品名稱</p>
+                    <p className="text-[22px] font-bold">{queryResult.name}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-[15px] opacity-50 font-bold uppercase tracking-wider">款式代號</p>
+                      <p className="text-[18px] font-medium">{queryResult.productCode}</p>
+                    </div>
+                    <div>
+                      <p className="text-[15px] opacity-50 font-bold uppercase tracking-wider">國際條碼</p>
+                      <p className="text-[18px] font-medium">{queryResult.barcode}</p>
+                    </div>
+                  </div>
+                  <div className="pt-6 border-t border-black/5 dark:border-white/5">
+                    <label className="text-[16px] font-bold text-blue-500 block mb-2">修改實盤數量</label>
+                    <input 
+                      type="number"
+                      value={queryEditQty}
+                      onChange={(e) => setQueryEditQty(e.target.value)}
+                      className={`w-full px-4 py-4 rounded-xl border outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-3xl font-bold ${isDarkMode ? 'bg-[#1E1E1E] border-white/10' : 'bg-slate-50 border-black/10'}`}
+                    />
+                  </div>
+                </div>
+              ) : queryInputValue === '' && !queryResult ? null : (
+                <div className="py-12 text-center opacity-40">
+                  <AlertCircle size={64} className="mx-auto mb-4" />
+                  <p className="text-[18px] font-medium">查無此條碼之盤點紀錄</p>
+                </div>
+              )}
+            </div>
+            <div className={`p-6 border-t flex gap-4 ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
+              <button 
+                onClick={() => {
+                  setShowQueryModal(false);
+                  setQueryInputValue('');
+                  setQueryResult(null);
+                }}
+                className={`flex-1 py-4 rounded-xl font-bold text-[17px] transition-all ${isDarkMode ? 'bg-white/5 hover:bg-white/10' : 'bg-black/5 hover:bg-black/10'}`}
+              >
+                取消離開
+              </button>
+              {queryResult && (
+                <button 
+                  onClick={handleSaveQueryEdit}
+                  className="flex-1 py-4 rounded-xl bg-blue-500 text-white font-bold text-[17px] hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20"
+                >
+                  儲存修改並離開
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -998,7 +1170,7 @@ const App: React.FC = () => {
             <div className={`p-6 flex justify-between items-center shrink-0 border-b ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
               <div className="flex items-center gap-3">
                 <LayoutDashboard size={20} className="text-blue-500" />
-                <h3 className="text-lg font-bold">盤點數據儀表板</h3>
+                <h3 className="text-2xl font-bold">盤點數據儀表板</h3>
               </div>
               <button onClick={() => setShowDashboard(false)} className={`p-2 rounded-full transition-colors ${isDarkMode ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}><X size={20} /></button>
             </div>
@@ -1014,8 +1186,8 @@ const App: React.FC = () => {
                 ].map((stat, idx) => (
                   <div key={idx} className={`p-6 rounded-xl border flex flex-col items-center justify-center text-center shadow-sm ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
                     <stat.icon size={20} className={`mb-3 ${stat.color}`} />
-                    <span className="text-[11px] font-bold uppercase tracking-wider opacity-50 mb-1">{stat.label}</span>
-                    <span className="text-2xl font-bold tracking-tight">{stat.value}</span>
+                    <span className="text-[15px] font-bold uppercase tracking-wider opacity-50 mb-1">{stat.label}</span>
+                    <span className="text-3xl font-bold tracking-tight">{stat.value}</span>
                   </div>
                 ))}
               </div>
@@ -1024,7 +1196,7 @@ const App: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* 進度圓餅圖 */}
                 <div className={`p-6 rounded-xl border h-[350px] flex flex-col shadow-sm ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
-                  <h4 className="text-[13px] font-bold mb-6 flex items-center gap-2 opacity-50 uppercase tracking-wider"><BarChart3 size={14} className="text-blue-500" /> 盤點狀態分佈</h4>
+                  <h4 className="text-[16px] font-bold mb-6 flex items-center gap-2 opacity-50 uppercase tracking-wider"><BarChart3 size={14} className="text-blue-500" /> 盤點狀態分佈</h4>
                   <div className="flex-1">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -1046,7 +1218,7 @@ const App: React.FC = () => {
                         <Tooltip 
                           contentStyle={{ backgroundColor: isDarkMode ? '#2D2D2D' : '#fff', border: 'none', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px' }}
                         />
-                        <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} />
+                        <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '14px', fontWeight: 'bold' }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -1054,7 +1226,7 @@ const App: React.FC = () => {
 
                 {/* 差異最大的商品 */}
                 <div className={`p-6 rounded-xl border h-[350px] flex flex-col shadow-sm ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
-                  <h4 className="text-[13px] font-bold mb-6 flex items-center gap-2 opacity-50 uppercase tracking-wider"><TrendingDown size={14} className="text-red-500" /> 庫存差異排行 (Top 5)</h4>
+                  <h4 className="text-[16px] font-bold mb-6 flex items-center gap-2 opacity-50 uppercase tracking-wider"><TrendingDown size={14} className="text-red-500" /> 庫存差異排行 (Top 5)</h4>
                   <div className="flex-1">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -1068,7 +1240,7 @@ const App: React.FC = () => {
                         margin={{ left: 20, right: 30 }}
                       >
                         <XAxis type="number" hide />
-                        <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} style={{ fontSize: '11px', fontWeight: 'bold', opacity: 0.5 }} />
+                        <YAxis dataKey="name" type="category" width={80} axisLine={false} tickLine={false} style={{ fontSize: '14px', fontWeight: 'bold', opacity: 0.5 }} />
                         <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                         <Bar dataKey="diff" radius={[0, 4, 4, 0]} barSize={20}>
                           {data.map((entry, index) => (
@@ -1083,18 +1255,18 @@ const App: React.FC = () => {
 
               {/* 異常摘要 */}
               <div className={`p-6 rounded-xl border ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5 shadow-sm'}`}>
-                <h4 className="text-[13px] font-bold mb-6 opacity-50 uppercase tracking-wider">異常項目摘要</h4>
+                <h4 className="text-[16px] font-bold mb-6 opacity-50 uppercase tracking-wider">異常項目摘要</h4>
                 <div className="grid grid-cols-3 gap-8">
                   <div className="space-y-1">
-                    <span className="text-[11px] font-bold opacity-40 uppercase">盤盈項目</span>
+                    <span className="text-[15px] font-bold opacity-40 uppercase">盤盈項目</span>
                     <p className="text-xl font-bold text-emerald-500">{data.filter(i => i.diff > 0).length} <span className="text-xs opacity-50">項</span></p>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[11px] font-bold opacity-40 uppercase">盤虧項目</span>
+                    <span className="text-[15px] font-bold opacity-40 uppercase">盤虧項目</span>
                     <p className="text-xl font-bold text-red-500">{data.filter(i => i.diff < 0).length} <span className="text-xs opacity-50">項</span></p>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[11px] font-bold opacity-40 uppercase">未盤點</span>
+                    <span className="text-[15px] font-bold opacity-40 uppercase">未盤點</span>
                     <p className="text-xl font-bold opacity-50">{data.filter(i => i.actualQty === 0 && i.bookQty > 0).length} <span className="text-xs opacity-50">項</span></p>
                   </div>
                 </div>
@@ -1104,7 +1276,7 @@ const App: React.FC = () => {
             <div className={`p-6 border-t flex justify-end ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-white border-black/5'}`}>
               <button 
                 onClick={() => setShowDashboard(false)}
-                className="px-10 py-2.5 rounded-lg bg-blue-500 text-white font-bold text-[14px] hover:bg-blue-600 transition-all shadow-sm"
+                className="px-10 py-2.5 rounded-lg bg-blue-500 text-white font-bold text-[18px] hover:bg-blue-600 transition-all shadow-sm"
               >
                 完成
               </button>
@@ -1194,7 +1366,7 @@ const App: React.FC = () => {
             <div className={`p-6 flex justify-between items-center shrink-0 border-b ${isDarkMode ? 'bg-[#2D2D2D] border-white/5' : 'bg-[#2D2D3A] text-white border-black/5'}`}>
               <div className="flex items-center gap-3">
                 <Settings size={22} className="text-white" />
-                <h3 className="text-[18px] font-bold">系統設定</h3>
+                <h3 className="text-[22px] font-bold">系統設定</h3>
               </div>
               <button onClick={() => setShowSettings(false)} className="p-2 rounded-full hover:bg-white/10 transition-colors"><X size={20} /></button>
             </div>
@@ -1202,7 +1374,7 @@ const App: React.FC = () => {
             <div className="p-8 space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-[14px] font-bold opacity-60 ml-1">盤點人員</label>
+                  <label className="text-[18px] font-bold opacity-60 ml-1">盤點人員</label>
                   <input 
                     type="text" 
                     value={operatorName} 
@@ -1213,7 +1385,7 @@ const App: React.FC = () => {
                 </div>
                 
                 <div className="flex flex-col gap-2">
-                  <label className="text-[14px] font-bold uppercase tracking-wider opacity-60 ml-1">倉庫代號</label>
+                  <label className="text-[18px] font-bold uppercase tracking-wider opacity-60 ml-1">倉庫代號</label>
                   <input 
                     type="text" 
                     value={warehouseCode} 
@@ -1224,7 +1396,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-[14px] font-bold uppercase tracking-wider opacity-60 ml-1">貨架編號</label>
+                  <label className="text-[18px] font-bold uppercase tracking-wider opacity-60 ml-1">貨架編號</label>
                   <input 
                     type="text" 
                     value={currentShelf} 
